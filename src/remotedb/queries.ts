@@ -1,4 +1,4 @@
-import {Span} from '@sentry/tracing';
+// import {Span} from '@sentry/tracing';
 
 import * as entities from 'src/entities';
 
@@ -18,7 +18,7 @@ import {UInt32, Binary} from './fields';
 type HandlerOpts<A extends Record<string, unknown> = Record<string, unknown>> = {
   conn: Connection;
   lookupDescriptor: LookupDescriptor;
-  span: Span;
+  span: undefined;
   args: A;
 };
 

@@ -1,4 +1,4 @@
-import {Span} from '@sentry/tracing';
+// import {Span} from '@sentry/tracing';
 
 import {RpcConnection, RpcProgram} from './rpc';
 import {portmap, mount, nfs} from './xdr';
@@ -66,8 +66,8 @@ export type FileInfo = {
 /**
  * Request a list of export entries.
  */
-export async function getExports(conn: RpcProgram, span?: Span) {
-  const tx = span?.startChild({op: 'getExports'});
+export async function getExports(conn: RpcProgram, span?: any) {
+  // const tx = span?.startChild({op: 'getExports'});
 
   const data = await conn.call({
     procedure: mount.Procedure.export().value,
@@ -84,7 +84,7 @@ export async function getExports(conn: RpcProgram, span?: Span) {
     groups: flattenLinkedList(entry.groups()).map((g: any) => g.name().toString()),
   }));
 
-  tx?.finish();
+  // tx?.finish();
 
   return exports as Export[];
 }
@@ -95,9 +95,9 @@ export async function getExports(conn: RpcProgram, span?: Span) {
 export async function mountFilesystem(
   conn: RpcProgram,
   {filesystem}: Export,
-  span?: Span
+  span?: undefined
 ) {
-  const tx = span?.startChild({op: 'mountFilesystem', data: {filesystem}});
+  // const tx = span?.startChild({op: 'mountFilesystem', data: {filesystem}});
 
   const resp = await conn.call({
     procedure: mount.Procedure.mount().value,
@@ -109,7 +109,7 @@ export async function mountFilesystem(
     throw new Error('Failed to mount filesystem');
   }
 
-  tx?.finish();
+  // tx?.finish();
 
   return fileHandleResp.success() as Buffer;
 }
@@ -122,9 +122,9 @@ export async function lookupFile(
   conn: RpcProgram,
   handle: Buffer,
   filename: string,
-  span?: Span
+  span?: undefined
 ) {
-  const tx = span?.startChild({op: 'lookupFile', description: filename});
+  // const tx = span?.startChild({op: 'lookupFile', description: filename});
 
   const resp = await conn.call({
     procedure: nfs.Procedure.lookup().value,
@@ -146,7 +146,7 @@ export async function lookupFile(
     type: attributes.type().name,
   };
 
-  tx?.finish();
+  // tx?.finish();
 
   return info;
 }
@@ -158,9 +158,9 @@ export async function lookupPath(
   conn: RpcProgram,
   rootHandle: Buffer,
   filepath: string,
-  span?: Span
+  span?: undefined
 ) {
-  const tx = span?.startChild({op: 'lookupPath', description: filepath});
+  // const tx = span?.startChild({op: 'lookupPath', description: filepath});
 
   // There are times when the path includes a leading slash, sanitize that
   const pathParts = filepath.replace(/^\//, '').split('/');
@@ -170,13 +170,13 @@ export async function lookupPath(
 
   while (pathParts.length !== 0) {
     const filename = pathParts.shift()!;
-    const fileInfo = await lookupFile(conn, handle, filename, tx);
+    const fileInfo = await lookupFile(conn, handle, filename, undefined);
 
     info = fileInfo;
     handle = info.handle;
   }
 
-  tx?.finish();
+  // tx?.finish();
 
   // We can gaurentee this will be set since we will have failed to lookup the
   // file above
@@ -191,16 +191,16 @@ export async function fetchFile(
   conn: RpcProgram,
   file: FileInfo,
   onProgress?: (progress: FetchProgress) => void,
-  span?: Span
+  span?: undefined
 ) {
   const {handle, name, size} = file;
   const data = Buffer.alloc(size);
 
-  const tx = span?.startChild({
-    op: 'download',
-    description: name,
-    data: {size},
-  });
+  // const tx = span?.startChild({
+  //   op: 'download',
+  //   description: name,
+  //   data: {size},
+  // });
 
   let bytesRead = 0;
 
@@ -230,7 +230,7 @@ export async function fetchFile(
     onProgress?.({read: bytesRead, total: size});
   }
 
-  tx?.finish();
+  // tx?.finish();
 
   return data;
 }

@@ -12,7 +12,7 @@ import {
   UInt32,
   Binary,
 } from 'src/remotedb/fields';
-import {Span, SpanStatus} from '@sentry/tracing';
+// import {Span, SpanStatus} from '@sentry/tracing';
 
 /**
  * Argument types are used in argument list fields. This is essentially
@@ -69,12 +69,12 @@ export class Message<T extends MessageType = MessageType> {
   static async fromStream<T extends Response>(
     stream: PromiseReadable<any>,
     expect: T,
-    span: Span
+    span: undefined
   ) {
-    const tx = span.startChild({
-      op: 'readFromStream',
-      description: getMessageName(expect),
-    });
+    // const tx = span.startChild({
+    //   op: 'readFromStream',
+    //   description: getMessageName(expect),
+    // });
 
     // 01. Read magic bytes
     const magicHeader = await readField(stream, FieldType.UInt32);
@@ -114,13 +114,13 @@ export class Message<T extends MessageType = MessageType> {
       const expected = expect.toString(16);
       const actual = messageType.value.toString(16);
 
-      tx.setStatus(SpanStatus.FailedPrecondition);
-      tx.finish();
+      // tx.setStatus(SpanStatus.FailedPrecondition);
+      // tx.finish();
 
       throw new Error(`Expected message type 0x${expected}, got 0x${actual}`);
     }
 
-    tx.finish();
+    // tx.finish();
 
     return new Message({
       transactionId: txId.value,

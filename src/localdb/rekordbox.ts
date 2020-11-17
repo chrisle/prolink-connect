@@ -1,5 +1,5 @@
-import * as Sentry from '@sentry/node';
-import {Span} from '@sentry/tracing';
+// import * as Sentry from '@sentry/node';
+// import {Span} from '@sentry/tracing';
 import {KaitaiStream} from 'kaitai-struct';
 
 import RekordboxPdb from 'src/localdb/kaitai/rekordbox_pdb.ksy';
@@ -66,7 +66,7 @@ type Options = {
   /**
    * Sentry tracing span for the parent transaction
    */
-  span?: Span;
+  span?: any;
   /**
    * For larger music collections, it may take some time to load everything,
    * especially when limited by IO. When hydration progresses this function
@@ -122,30 +122,30 @@ class RekordboxHydrator {
    * Extract entries from a rekordbox pdb file and hydrate the passed database
    * connection with entities derived from the rekordbox entries.
    */
-  async hydrateFromPdb(pdbData: Buffer, span?: Span) {
-    const tx = span
-      ? span.startChild({op: 'hydrateFromPdb'})
-      : Sentry.startTransaction({name: 'hydrateFromPdb'});
+  async hydrateFromPdb(pdbData: Buffer, span?: any) {
+    // const tx = span
+    //   ? span.startChild({op: 'hydrateFromPdb'})
+    //   : Sentry.startTransaction({name: 'hydrateFromPdb'});
 
-    const parseTx = tx.startChild({op: 'parsePdbData', data: {size: pdbData.length}});
+    // const parseTx = tx.startChild({op: 'parsePdbData', data: {size: pdbData.length}});
     const stream = new KaitaiStream(pdbData);
     const db = new RekordboxPdb(stream);
-    parseTx.finish();
+    // parseTx.finish();
 
-    const hydrateTx = tx.startChild({op: 'hydration'});
+    // const hydrateTx = tx.startChild({op: 'hydration'});
     await Promise.all(
-      db.tables.map((table: any) => this.hydrateFromTable(table, hydrateTx))
+      db.tables.map((table: any) => this.hydrateFromTable(table, null))
     );
-    hydrateTx.finish();
+    // hydrateTx.finish();
 
-    tx.finish();
+    // tx.finish();
   }
 
   /**
    * Hydrate the database with entities from the provided RekordboxPdb table.
    * See pdbEntityCreators for how tables are mapped into database entities.
    */
-  async hydrateFromTable(table: any, span: Span) {
+  async hydrateFromTable(table: any, span: any) {
     const tableName = pdbTables[table.type];
     const createObject = pdbEntityCreators[table.type];
 

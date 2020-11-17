@@ -1,4 +1,4 @@
-import {Span} from '@sentry/tracing';
+// import {Span} from '@sentry/tracing';
 
 import LocalDatabase from 'src/localdb';
 import RemoteDatabase, {MenuTarget, Query} from 'src/remotedb';
@@ -26,7 +26,7 @@ export type Options = {
   /**
    * The Sentry transaction span
    */
-  span?: Span;
+  span?: any;
 };
 
 export async function viaRemote(remote: RemoteDatabase, opts: Required<Options>) {
