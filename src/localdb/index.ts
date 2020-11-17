@@ -1,9 +1,8 @@
-import * as Sentry from '@sentry/node';
-import {Mutex} from 'async-mutex';
-import StrictEventEmitter from 'strict-event-emitter-types';
-
+// import * as Sentry from '@sentry/node';
 import {createHash} from 'crypto';
 import {EventEmitter} from 'events';
+import {Mutex} from 'async-mutex';
+import StrictEventEmitter from 'strict-event-emitter-types';
 
 import DeviceManager from 'src/devices';
 import {fetchFile, FetchProgress} from 'src/nfs';
@@ -174,14 +173,14 @@ class LocalDatabase {
    * Downloads and hydrates a new in-memory sqlite database
    */
   #hydrateDatabase = async (device: Device, slot: DatabaseSlot, media: MediaSlotInfo) => {
-    const tx = Sentry.startTransaction({name: 'hydrateDatabase'});
+    // const tx = Sentry.startTransaction({name: 'hydrateDatabase'});
 
-    tx.setTag('slot', getSlotName(media.slot));
-    tx.setData('numTracks', media.trackCount.toString());
+    // tx.setTag('slot', getSlotName(media.slot));
+    // tx.setData('numTracks', media.trackCount.toString());
 
-    const dbCreateTx = tx.startChild({op: 'setupDatabase'});
+    // const dbCreateTx = tx.startChild({op: 'setupDatabase'});
     const orm = new MetadataORM();
-    dbCreateTx.finish();
+    // dbCreateTx.finish();
 
     let pdbData = Buffer.alloc(0);
 
@@ -190,7 +189,7 @@ class LocalDatabase {
         device,
         slot,
         path,
-        span: tx,
+        span: undefined,
         onProgress: progress =>
           this.#emitter.emit('fetchProgress', {device, slot, progress}),
       }));
@@ -215,7 +214,7 @@ class LocalDatabase {
     await hydrateDatabase({
       orm,
       pdbData,
-      span: tx,
+      span: undefined,
       onProgress: progress =>
         this.#emitter.emit('hydrationProgress', {device, slot, progress}),
     });
@@ -224,7 +223,7 @@ class LocalDatabase {
     const db = {orm, media, id: getMediaId(media)};
     this.#dbs.push(db);
 
-    tx.finish();
+    // tx.finish();
 
     return db;
   };

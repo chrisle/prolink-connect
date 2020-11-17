@@ -1,5 +1,5 @@
-import * as Sentry from '@sentry/node';
-import {SpanStatus} from '@sentry/tracing';
+// import * as Sentry from '@sentry/node';
+// import {SpanStatus} from '@sentry/tracing';
 
 import DeviceManager from 'src/devices';
 import {Track} from 'src/entities';
@@ -74,15 +74,15 @@ class Database {
   async getMetadata(opts: GetMetadata.Options) {
     const {deviceId, trackType, trackSlot, span} = opts;
 
-    const tx = span
-      ? span.startChild({op: 'dbGetMetadata'})
-      : Sentry.startTransaction({name: 'dbGetMetadata'});
+    // const tx = span
+    //   ? span.startChild({op: 'dbGetMetadata'})
+    //   : Sentry.startTransaction({name: 'dbGetMetadata'});
 
-    tx.setTag('deviceId', deviceId.toString());
-    tx.setTag('trackType', getTrackTypeName(trackType));
-    tx.setTag('trackSlot', getSlotName(trackSlot));
+    // tx.setTag('deviceId', deviceId.toString());
+    // tx.setTag('trackType', getTrackTypeName(trackType));
+    // tx.setTag('trackSlot', getSlotName(trackSlot));
 
-    const callOpts = {...opts, span: tx};
+    const callOpts = {...opts, span: null};
 
     const device = await this.#deviceManager.getDeviceEnsured(deviceId);
     if (device === null) {
@@ -101,10 +101,10 @@ class Database {
     }
 
     if (strategy === LookupStrategy.NoneAvailable) {
-      tx.setStatus(SpanStatus.Unavailable);
+      // tx.setStatus(SpanStatus.Unavailable);
     }
 
-    tx.finish();
+    // tx.finish();
 
     return track;
   }
@@ -115,15 +115,15 @@ class Database {
   async getArtwork(opts: GetArtwork.Options) {
     const {deviceId, trackType, trackSlot, span} = opts;
 
-    const tx = span
-      ? span.startChild({op: 'dbGetArtwork'})
-      : Sentry.startTransaction({name: 'dbGetArtwork'});
+    // const tx = span
+    //   ? span.startChild({op: 'dbGetArtwork'})
+    //   : Sentry.startTransaction({name: 'dbGetArtwork'});
 
-    tx.setTag('deviceId', deviceId.toString());
-    tx.setTag('trackType', getTrackTypeName(trackType));
-    tx.setTag('trackSlot', getSlotName(trackSlot));
+    // tx.setTag('deviceId', deviceId.toString());
+    // tx.setTag('trackType', getTrackTypeName(trackType));
+    // tx.setTag('trackSlot', getSlotName(trackSlot));
 
-    const callOpts = {...opts, span: tx};
+    const callOpts = {...opts, span: null};
 
     const device = await this.#deviceManager.getDeviceEnsured(deviceId);
     if (device === null) {
@@ -142,10 +142,10 @@ class Database {
     }
 
     if (strategy === LookupStrategy.NoneAvailable) {
-      tx.setStatus(SpanStatus.Unavailable);
+      // tx.setStatus(SpanStatus.Unavailable);
     }
 
-    tx.finish();
+    // tx.finish();
 
     return artwork;
   }

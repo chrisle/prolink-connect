@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/node';
-import {Span} from '@sentry/tracing';
+// import {Span} from '@sentry/tracing';
 
 import {Track} from 'src/entities';
 import LocalDatabase from 'src/localdb';
@@ -27,7 +27,7 @@ export type Options = {
   /**
    * The Sentry transaction span
    */
-  span?: Span;
+  span?: any;
 };
 
 export async function viaRemote(remote: RemoteDatabase, opts: Required<Options>) {
@@ -79,7 +79,7 @@ export async function viaLocal(
   try {
     return fetchFile({device, slot: trackSlot, path: track.artwork.path});
   } catch (error) {
-    Sentry.captureException(error);
+    // Sentry.captureException(error);
     return null;
   }
 }

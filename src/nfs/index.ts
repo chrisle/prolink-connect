@@ -1,5 +1,5 @@
-import * as Sentry from '@sentry/node';
-import {Span} from '@sentry/tracing';
+// import * as Sentry from '@sentry/node';
+// import {Span} from '@sentry/tracing';
 
 import {Device, DeviceID, MediaSlot} from 'src/types';
 import {getSlotName} from 'src/utils';
@@ -88,7 +88,7 @@ type GetRootHandleOptions = {
   device: Device;
   slot: keyof typeof slotMountMapping;
   mountClient: RpcProgram;
-  span?: Span;
+  span?: any;
 };
 
 /**
@@ -140,7 +140,7 @@ type FetchFileOptions = {
   slot: keyof typeof slotMountMapping;
   path: string;
   onProgress?: Parameters<typeof fetchFileCall>[2];
-  span?: Span;
+  span?: any;
 };
 
 const badRoothandleError = (slot: MediaSlot, deviceId: DeviceID) =>
@@ -161,12 +161,12 @@ export async function fetchFile({
   onProgress,
   span,
 }: FetchFileOptions) {
-  const tx = span
-    ? span.startChild({op: 'fetchFile'})
-    : Sentry.startTransaction({name: 'fetchFile'});
+  // const tx = span
+  //   ? span.startChild({op: 'fetchFile'})
+  //   : Sentry.startTransaction({name: 'fetchFile'});
 
   const {mountClient, nfsClient} = await getClients(device.ip.address);
-  const rootHandle = await getRootHandle({device, slot, mountClient, span: tx});
+  const rootHandle = await getRootHandle({device, slot, mountClient, span: undefined});
 
   if (rootHandle === null) {
     throw badRoothandleError(slot, device.id);
@@ -177,25 +177,25 @@ export async function fetchFile({
   let fileInfo: FileInfo | null = null;
 
   try {
-    fileInfo = await lookupPath(nfsClient, rootHandle, path, tx);
+    fileInfo = await lookupPath(nfsClient, rootHandle, path, undefined);
   } catch {
     rootHandleCache.delete(device.ip.address);
-    const rootHandle = await getRootHandle({device, slot, mountClient, span: tx});
+    const rootHandle = await getRootHandle({device, slot, mountClient, span: undefined});
 
     if (rootHandle === null) {
       throw badRoothandleError(slot, device.id);
     }
 
     // Desperately try once more to lookup the file
-    fileInfo = await lookupPath(nfsClient, rootHandle, path, tx);
+    fileInfo = await lookupPath(nfsClient, rootHandle, path, undefined);
   }
 
-  const file = await fetchFileCall(nfsClient, fileInfo, onProgress, tx);
+  const file = await fetchFileCall(nfsClient, fileInfo, onProgress, undefined);
 
-  tx.setData('path', path);
-  tx.setData('slot', getSlotName(slot));
-  tx.setData('size', fileInfo.size);
-  tx.finish();
+  // tx.setData('path', path);
+  // tx.setData('slot', getSlotName(slot));
+  // tx.setData('size', fileInfo.size);
+  // tx.finish();
 
   return file;
 }

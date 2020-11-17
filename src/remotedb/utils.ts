@@ -1,4 +1,4 @@
-import {Span} from '@sentry/tracing';
+// import {Span} from '@sentry/tracing';
 
 import {Items, ItemType} from './message/item';
 import {MessageType} from './message/types';
@@ -45,7 +45,7 @@ export async function* renderItems<T extends ItemType = ItemType>(
   conn: Connection,
   descriptor: LookupDescriptor,
   total: number,
-  span: Span
+  span: undefined
 ) {
   let itemsRead = 0;
 
