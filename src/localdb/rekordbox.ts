@@ -150,7 +150,7 @@ class RekordboxHydrator {
     const tableName = pdbTables[table.type];
     const createObject = pdbEntityCreators[table.type];
 
-    const tx = span.startChild({op: 'hydrateFromTable', description: tableName});
+    // const tx = span.startChild({op: 'hydrateFromTable', description: tableName});
 
     if (createObject === undefined) {
       return;
@@ -164,7 +164,7 @@ class RekordboxHydrator {
       totalItems++;
     }
 
-    tx.setData('items', totalItems);
+    // tx.setData('items', totalItems);
 
     for (const row of tableRows(table)) {
       this.#orm.insertEntity(tableName, createObject(row));
@@ -174,7 +174,7 @@ class RekordboxHydrator {
       await new Promise(r => setTimeout(r, 0));
     }
 
-    tx.finish();
+    // tx.finish();
   }
 }
 
