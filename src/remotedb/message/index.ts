@@ -13,6 +13,7 @@ import {
 } from 'src/remotedb/fields';
 import {responseTransform} from 'src/remotedb/message/response';
 import {getMessageName, MessageType, Response} from 'src/remotedb/message/types';
+// import {Span, SpanStatus} from '@sentry/tracing';
 
 /**
  * Argument types are used in argument list fields. This is essentially

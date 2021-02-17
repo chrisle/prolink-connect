@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/node';
+// import * as Sentry from '@sentry/node';
 // import {Span} from '@sentry/tracing';
 
 import {Track} from 'src/entities';
