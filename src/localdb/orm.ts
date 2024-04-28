@@ -89,7 +89,7 @@ export class MetadataORM {
   findTrack(id: number): Track {
     const row: Record<string, any> = this.#conn
       .prepare(`select * from ${Table.Track} where id = ?`)
-      .get(id);
+      .get(id) as any;
 
     // Map row columns to camel case compatability
     const trackRow = mapKeys(row, (_, k) => camelCase(k)) as Track<EntityFK.WithFKs>;
@@ -125,7 +125,7 @@ export class MetadataORM {
 
       const relationItem: Record<string, any> = this.#conn
         .prepare(`select * from ${table} where id = ?`)
-        .get(fk);
+        .get(fk) as any;
 
       track[relation] = relationItem;
     }
@@ -148,7 +148,7 @@ export class MetadataORM {
     // Lookup playlists / folders for this playlist ID
     const playlistRows: Array<Record<string, any>> = this.#conn
       .prepare(`select * from ${Table.Playlist} where ${parentCondition}`)
-      .all(playlistId);
+      .all(playlistId) as any[];
 
     const [folders, playlists] = partition(
       playlistRows.map(row => mapKeys(row, (_, k) => camelCase(k)) as Playlist),
@@ -157,7 +157,7 @@ export class MetadataORM {
 
     const entryRows: Array<Record<string, any>> = this.#conn
       .prepare(`select * from ${Table.PlaylistEntry} where playlist_id = ?`)
-      .all(playlistId);
+      .all(playlistId) as any[];
 
     const trackEntries = entryRows.map(
       row => mapKeys(row, (_, k) => camelCase(k)) as PlaylistEntry<EntityFK.WithFKs>
