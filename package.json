@@ -43,6 +43,7 @@
     "@types/signale": "^1.4.7",
     "async-mutex": "^0.3.0",
     "better-sqlite3": "^11.7.0",
+    "iconv-lite": "^0.6.3",
     "ip-address": "^7.0.1",
     "js-xdr": "^1.3.0",
     "kaitai-struct": "^0.9.0-SNAPSHOT.1",
