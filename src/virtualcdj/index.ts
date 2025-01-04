@@ -85,9 +85,10 @@ export function makeAnnouncePacket(deviceToAnnounce: Device): Uint8Array {
 
   // unknown padding bytes
   const unknown1 = [0x01, 0x02];
-  const unknown2 = [0x01, 0x00, 0x00, 0x00];
+  // Updated on 2024-04-27 to be compatible with CDJ-3000 players that use player number 5 or 6.
+  const unknown2 = [0x02, 0x00, 0x00, 0x00];
 
-  // The packet blow is constructed in the followig format:
+  // The packet below is constructed in the following format:
   //
   //  - 0x00: 10 byte header
   //  - 0x0A: 02 byte announce packet type
@@ -114,7 +115,8 @@ export function makeAnnouncePacket(deviceToAnnounce: Device): Uint8Array {
     ...d.ip.toArray(),
     ...unknown2,
     ...[d.type],
-    ...[0x00],
+    // Updated on 2024-04-27 to be compatible with CDJ-3000 players that use player number 5 or 6.
+    ...[0x64],
   ];
 
   return Uint8Array.from(parts);
