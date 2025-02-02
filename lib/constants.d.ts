@@ -28,9 +28,9 @@ export declare const PROLINK_HEADER: Uint8Array;
 /**
  * VirtualCDJName is the name given to the Virtual CDJ device.
  */
-export declare const VIRTUAL_CDJ_NAME = 'Now Playing';
+export declare const VIRTUAL_CDJ_NAME = "Now Playing";
 /**
  * VirtualCDJFirmware is a string indicating the firmware version reported with
  * status packets.
  */
-export declare const VIRTUAL_CDJ_FIRMWARE = '1.43';
+export declare const VIRTUAL_CDJ_FIRMWARE = "1.43";
