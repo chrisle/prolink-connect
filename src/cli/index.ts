@@ -1,6 +1,6 @@
 import '@sentry/tracing';
 
-import * as Sentry from '@sentry/node';
+import * as Telemetry from 'src/utils/telemetry';
 import signale from 'signale';
 
 import {MixstatusProcessor} from 'src/mixstatus';
@@ -8,7 +8,7 @@ import {bringOnline} from 'src/network';
 
 import fs from 'fs';
 
-Sentry.init({
+Telemetry.init({
   dsn: 'https://36570041fd5a4c05af76456e60a1233a@o126623.ingest.sentry.io/5205486',
   tracesSampleRate: 1,
 });

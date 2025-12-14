@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/node';
+import * as Telemetry from 'src/utils/telemetry';
 import {Span} from '@sentry/tracing';
 
 import {Track} from 'src/entities';
@@ -79,7 +79,7 @@ export async function viaLocal(
   try {
     return fetchFile({device, slot: trackSlot, path: track.artwork.path});
   } catch (error) {
-    Sentry.captureException(error);
+    Telemetry.captureException(error);
     return null;
   }
 }

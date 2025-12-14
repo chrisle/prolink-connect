@@ -1,14 +1,13 @@
-/// <reference types="node" />
 import { Span } from '@sentry/tracing';
-import { Track } from "../entities";
-import { MetadataORM } from "./orm";
-import { BeatGrid, CueAndLoop, WaveformHD } from "../types";
+import { Track } from 'src/entities';
+import { MetadataORM } from 'src/localdb/orm';
+import { BeatGrid, CueAndLoop, WaveformHD } from 'src/types';
 /**
  * The provided function should resolve ANLZ files into buffers. Typically
  * you would just read the file, but in the case of the prolink network, this
  * would handle loading the file over NFS.
  */
-declare type AnlzResolver = (path: string) => Promise<Buffer>;
+type AnlzResolver = (path: string) => Promise<Buffer>;
 /**
  * Data returned from loading DAT anlz files
  */

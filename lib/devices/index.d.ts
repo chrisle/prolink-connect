@@ -1,9 +1,7 @@
-/// <reference types="node" />
-/// <reference types="node" />
 import StrictEventEmitter from 'strict-event-emitter-types';
 import { Socket } from 'dgram';
 import { EventEmitter } from 'events';
-import { Device, DeviceID } from "../types";
+import { Device, DeviceID } from 'src/types';
 interface Config {
     /**
      * Time in milliseconds after which a device is considered to have
@@ -16,7 +14,7 @@ interface Config {
 /**
  * The configuration object that may be passed to reconfigure the manager
  */
-declare type ConfigEditable = Omit<Config, 'announceSocket'>;
+type ConfigEditable = Omit<Config, 'announceSocket'>;
 /**
  * The interface the device manager event emitter should follow
  */
@@ -35,7 +33,7 @@ interface DeviceEvents {
      */
     announced: (device: Device) => void;
 }
-declare type Emitter = StrictEventEmitter<EventEmitter, DeviceEvents>;
+type Emitter = StrictEventEmitter<EventEmitter, DeviceEvents>;
 /**
  * The device manager is responsible for tracking devices that appear on the
  * prolink network, providing an API to react to devices livecycle events as

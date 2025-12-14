@@ -1,7 +1,6 @@
-/// <reference types="node" />
 import StrictEventEmitter from 'strict-event-emitter-types';
 import { EventEmitter } from 'events';
-import { CDJStatus, DeviceID, MixstatusMode } from "../types";
+import { CDJStatus, DeviceID, MixstatusMode } from 'src/types';
 export interface MixstatusConfig {
     /**
      * Selects the mixstatus reporting mode
@@ -66,7 +65,7 @@ interface MixstatusEvents {
      */
     setEnded: () => void;
 }
-declare type Emitter = StrictEventEmitter<EventEmitter, MixstatusEvents>;
+type Emitter = StrictEventEmitter<EventEmitter, MixstatusEvents>;
 /**
  * MixstatusProcessor is a configurable processor which when fed device state
  * will attempt to accurately determine events that happen within the DJ set.

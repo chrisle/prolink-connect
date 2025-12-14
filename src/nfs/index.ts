@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/node';
+import * as Telemetry from 'src/utils/telemetry';
 import {Span} from '@sentry/tracing';
 
 import {Device, DeviceID, MediaSlot} from 'src/types';
@@ -165,7 +165,7 @@ export async function fetchFile({
 }: FetchFileOptions) {
   const tx = span
     ? span.startChild({op: 'fetchFile'})
-    : Sentry.startTransaction({name: 'fetchFile'});
+    : Telemetry.startTransaction({name: 'fetchFile'});
 
   const {mountClient, nfsClient} = await getClients(device.ip.address);
   const rootHandle = await getRootHandle({device, slot, mountClient, span: tx});

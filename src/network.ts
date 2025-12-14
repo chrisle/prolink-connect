@@ -1,5 +1,5 @@
-import * as Sentry from '@sentry/node';
-import {SpanStatus} from '@sentry/tracing';
+import * as Telemetry from 'src/utils/telemetry';
+import {SpanStatus} from 'src/utils/telemetry';
 
 import {randomUUID} from 'crypto';
 import dgram, {Socket} from 'dgram';
@@ -88,8 +88,8 @@ export type ConnectedProlinkNetwork = ProlinkNetwork & {
  * This is the primary entrypoint for connecting to the prolink network.
  */
 export async function bringOnline(config?: NetworkConfig) {
-  Sentry.setTag('connectionId', randomUUID());
-  const tx = Sentry.startTransaction({name: 'bringOnline'});
+  Telemetry.setTag('connectionId', randomUUID());
+  const tx = Telemetry.startTransaction({name: 'bringOnline'});
 
   // Socket used to listen for devices on the network
   const announceSocket = dgram.createSocket('udp4');
@@ -105,7 +105,7 @@ export async function bringOnline(config?: NetworkConfig) {
     await udpBind(beatSocket, BEAT_PORT, '0.0.0.0');
     await udpBind(statusSocket, STATUS_PORT, '0.0.0.0');
   } catch (err) {
-    Sentry.captureException(err);
+    Telemetry.captureException(err);
     tx.setStatus(SpanStatus.Unavailable);
     tx.finish();
 
@@ -185,7 +185,7 @@ export class ProlinkNetwork {
    * Defaults the Virtual CDJ ID to 7.
    */
   async autoconfigFromPeers() {
-    const tx = Sentry.startTransaction({name: 'autoConfigure'});
+    const tx = Telemetry.startTransaction({name: 'autoConfigure'});
     // wait for first device to appear on the network
     const firstDevice = await new Promise<Device>(resolve =>
       this.#deviceManager.once('connected', resolve)
@@ -221,7 +221,7 @@ export class ProlinkNetwork {
       throw new Error(connectErrorHelp);
     }
 
-    const tx = Sentry.startTransaction({name: 'connect'});
+    const tx = Telemetry.startTransaction({name: 'connect'});
 
     // Create VCDJ for the interface's broadcast address
     const vcdj = getVirtualCDJ(this.#config.iface, this.#config.vcdjId);

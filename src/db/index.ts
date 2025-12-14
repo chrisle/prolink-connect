@@ -1,5 +1,5 @@
-import * as Sentry from '@sentry/node';
-import {SpanStatus} from '@sentry/tracing';
+import * as Telemetry from 'src/utils/telemetry';
+import {SpanStatus} from 'src/utils/telemetry';
 
 import DeviceManager from 'src/devices';
 import {Track} from 'src/entities';
@@ -93,7 +93,7 @@ class Database {
 
     const tx = span
       ? span.startChild({op: 'dbGetMetadata'})
-      : Sentry.startTransaction({name: 'dbGetMetadata'});
+      : Telemetry.startTransaction({name: 'dbGetMetadata'});
 
     tx.setTag('deviceId', deviceId.toString());
     tx.setTag('trackType', getTrackTypeName(trackType));
@@ -134,7 +134,7 @@ class Database {
 
     const tx = span
       ? span.startChild({op: 'dbGetFile'})
-      : Sentry.startTransaction({name: 'dbGetFile'});
+      : Telemetry.startTransaction({name: 'dbGetFile'});
 
     tx.setTag('deviceId', deviceId.toString());
     tx.setTag('trackType', getTrackTypeName(trackType));
@@ -175,7 +175,7 @@ class Database {
 
     const tx = span
       ? span.startChild({op: 'dbGetArtwork'})
-      : Sentry.startTransaction({name: 'dbGetArtwork'});
+      : Telemetry.startTransaction({name: 'dbGetArtwork'});
 
     tx.setTag('deviceId', deviceId.toString());
     tx.setTag('trackType', getTrackTypeName(trackType));
@@ -216,7 +216,7 @@ class Database {
 
     const tx = span
       ? span.startChild({op: 'dbGetWaveforms'})
-      : Sentry.startTransaction({name: 'dbGetWaveforms'});
+      : Telemetry.startTransaction({name: 'dbGetWaveforms'});
 
     tx.setTag('deviceId', deviceId.toString());
     tx.setTag('trackType', getTrackTypeName(trackType));
@@ -261,7 +261,7 @@ class Database {
 
     const tx = span
       ? span.startChild({op: 'dbGetPlaylist'})
-      : Sentry.startTransaction({name: 'dbGetPlaylist'});
+      : Telemetry.startTransaction({name: 'dbGetPlaylist'});
 
     tx.setTag('deviceId', deviceId.toString());
     tx.setTag('mediaSlot', getSlotName(mediaSlot));

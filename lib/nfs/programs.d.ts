@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { Span } from '@sentry/tracing';
 import { RpcConnection, RpcProgram } from './rpc';
 import { FetchProgress } from '.';
@@ -39,7 +38,7 @@ export declare function getExports(conn: RpcProgram, span?: Span): Promise<Expor
 /**
  * Mount the specified export, returning the file handle.
  */
-export declare function mountFilesystem(conn: RpcProgram, { filesystem }: Export, span?: Span): Promise<Buffer>;
+export declare function mountFilesystem(conn: RpcProgram, { filesystem }: Export, span?: Span): Promise<Buffer<ArrayBufferLike>>;
 /**
  * Lookup a file within the directory of the provided file handle, returning
  * the FileInfo object if the file can be located.
@@ -53,5 +52,5 @@ export declare function lookupPath(conn: RpcProgram, rootHandle: Buffer, filepat
  * Fetch the specified file the remote NFS server. This will read the entire
  * file into memory.
  */
-export declare function fetchFile(conn: RpcProgram, file: FileInfo, onProgress?: (progress: FetchProgress) => void, span?: Span): Promise<Buffer>;
+export declare function fetchFile(conn: RpcProgram, file: FileInfo, onProgress?: (progress: FetchProgress) => void, span?: Span, readSize?: number): Promise<Buffer<ArrayBuffer>>;
 export {};

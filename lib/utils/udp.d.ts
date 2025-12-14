@@ -1,6 +1,3 @@
-/// <reference types="node" />
-/// <reference types="node" />
-/// <reference types="node" />
 import { BindOptions, Socket } from 'dgram';
 import { AddressInfo } from 'net';
 /**
@@ -11,7 +8,7 @@ export declare function udpBind(conn: Socket, options: BindOptions): Promise<Add
 /**
  * Async version of udp socket read
  */
-export declare function udpRead(conn: Socket): Promise<Buffer>;
+export declare function udpRead(conn: Socket): Promise<Buffer<ArrayBufferLike>>;
 /**
  * Async version of udp socket send
  */

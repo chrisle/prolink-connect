@@ -1,16 +1,15 @@
-/// <reference types="node" />
 import { Span } from '@sentry/tracing';
 import { PromiseReadable } from 'promise-readable';
-import { Field } from "../fields";
-import { responseTransform } from "./response";
-import { MessageType, Response } from "./types";
+import { Field } from 'src/remotedb/fields';
+import { responseTransform } from 'src/remotedb/message/response';
+import { MessageType, Response } from 'src/remotedb/message/types';
 interface Options<T extends MessageType> {
     transactionId?: number;
     type: T;
     args: Field[];
 }
-declare type ResponseType<T> = T extends Response ? T : never;
-declare type Data<T> = ReturnType<(typeof responseTransform)[ResponseType<T>]>;
+type ResponseType<T> = T extends Response ? T : never;
+type Data<T> = ReturnType<(typeof responseTransform)[ResponseType<T>]>;
 /**
  * Representation of a set of fields sequenced into a known message format.
  */
@@ -29,7 +28,7 @@ export declare class Message<T extends MessageType = MessageType> {
     /**
      * The byte serialization of the message
      */
-    get buffer(): Buffer;
+    get buffer(): Buffer<ArrayBuffer>;
     /**
      * The JS representation of the message.
      *

@@ -1,8 +1,8 @@
 import { Span } from '@sentry/tracing';
-import { Track } from "../entities";
-import LocalDatabase from "../localdb";
-import RemoteDatabase from "../remotedb";
-import { Device, DeviceID, MediaSlot, TrackType, Waveforms } from "../types";
+import { Track } from 'src/entities';
+import LocalDatabase from 'src/localdb';
+import RemoteDatabase from 'src/remotedb';
+import { Device, DeviceID, MediaSlot, TrackType, Waveforms } from 'src/types';
 export interface Options {
     /**
      * The device to query the track waveforms off of

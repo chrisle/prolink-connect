@@ -1,4 +1,4 @@
-import { Field, NumberField, StringField } from "../fields";
+import { Field, NumberField, StringField } from 'src/remotedb/fields';
 /**
  * Item types associated to the MenuItem message type.
  */
@@ -73,7 +73,7 @@ export declare enum ItemType {
 /**
  * All items have 12 arguments of these types
  */
-declare type ItemArgs = [
+type ItemArgs = [
     NumberField,
     NumberField,
     NumberField,
@@ -99,7 +99,7 @@ declare const makeItemData: (args: ItemArgs) => {
     type: ItemType;
     artworkId: number;
 };
-declare type ItemData = ReturnType<typeof makeItemData>;
+type ItemData = ReturnType<typeof makeItemData>;
 /**
  * Maps item types to structured objects
  */
@@ -513,18 +513,18 @@ declare const transformItem: {
  * Represents a generic Item, specialized to a specific item by providing a
  * ItemType to the template.
  */
-export declare type Item<T extends ItemType> = ReturnType<(typeof transformItem)[T]> & {
+export type Item<T extends ItemType> = ReturnType<(typeof transformItem)[T]> & {
     type: T;
 };
 /**
  * Maps ItemTypes to Items
  */
-export declare type Items = {
+export type Items = {
     [T in keyof typeof transformItem]: Item<T>;
 };
 /**
  * Translate a list of fields for an item response into a structure object,
  * making items more clear to work with.
  */
-export declare const fieldsToItem: (args: Field[]) => Item<ItemType.Path> | Item<ItemType.Folder> | Item<ItemType.AlbumTitle> | Item<ItemType.Disc> | Item<ItemType.TrackTitle> | Item<ItemType.Genre> | Item<ItemType.Artist> | Item<ItemType.Playlist> | Item<ItemType.Rating> | Item<ItemType.Duration> | Item<ItemType.Tempo> | Item<ItemType.Label> | Item<ItemType.Key> | Item<ItemType.BitRate> | Item<ItemType.Year> | Item<ItemType.Comment> | Item<ItemType.HistoryPlaylist> | Item<ItemType.OrigianlArtist> | Item<ItemType.Remixer> | Item<ItemType.DateAdded> | Item<ItemType.ColorNone> | Item<ItemType.ColorPink> | Item<ItemType.ColorRed> | Item<ItemType.ColorOrange> | Item<ItemType.ColorYellow> | Item<ItemType.ColorGreen> | Item<ItemType.ColorAqua> | Item<ItemType.ColorBlue> | Item<ItemType.ColorPurple> | Item<ItemType.MenuGenre> | Item<ItemType.MenuArtist> | Item<ItemType.MenuAlbum> | Item<ItemType.MenuTrack> | Item<ItemType.MenuPlaylist> | Item<ItemType.MenuBPM> | Item<ItemType.MenuRating> | Item<ItemType.MenuYear> | Item<ItemType.MenuRemixer> | Item<ItemType.MenuLabel> | Item<ItemType.MenuOriginal> | Item<ItemType.MenuKey> | Item<ItemType.MenuColor> | Item<ItemType.MenuFolder> | Item<ItemType.MenuSearch> | Item<ItemType.MenuTime> | Item<ItemType.MenuBit> | Item<ItemType.MenuFilename> | Item<ItemType.MenuHistory> | Item<ItemType.MenuAll> | Item<ItemType.TrackTitleAlbum> | Item<ItemType.TrackTitleGenre> | Item<ItemType.TrackTitleArtist> | Item<ItemType.TrackTitleRating> | Item<ItemType.TrackTitleTime> | Item<ItemType.TrackTitleBPM> | Item<ItemType.TrackTitleLabel> | Item<ItemType.TrackTitleKey> | Item<ItemType.TrackTitleBitRate> | Item<ItemType.TrackTitleColor> | Item<ItemType.TrackTitleComment> | Item<ItemType.TrackTitleOriginalArtist> | Item<ItemType.TrackTitleRemixer> | Item<ItemType.TrackTitleDJPlayCount> | Item<ItemType.MenuTrackTitleDateAdded>;
+export declare const fieldsToItem: (args: Field[]) => Items[ItemType];
 export {};

@@ -1,16 +1,15 @@
-/// <reference types="node" />
 import StrictEventEmitter from 'strict-event-emitter-types';
 import { EventEmitter } from 'events';
-import DeviceManager from "../devices";
-import { FetchProgress } from "../nfs";
-import StatusEmitter from "../status";
-import { Device, DeviceID, MediaSlot } from "../types";
+import DeviceManager from 'src/devices';
+import { FetchProgress } from 'src/nfs';
+import StatusEmitter from 'src/status';
+import { Device, DeviceID, MediaSlot } from 'src/types';
 import { MetadataORM } from './orm';
 import { HydrationProgress } from './rekordbox';
 /**
  * Rekordbox databases will only exist within these two slots
  */
-declare type DatabaseSlot = MediaSlot.USB | MediaSlot.SD;
+type DatabaseSlot = MediaSlot.USB | MediaSlot.SD;
 interface CommonProgressOpts {
     /**
      * The device progress is being reported for
@@ -21,19 +20,19 @@ interface CommonProgressOpts {
      */
     slot: MediaSlot;
 }
-declare type DownloadProgressOpts = CommonProgressOpts & {
+type DownloadProgressOpts = CommonProgressOpts & {
     /**
      * The current progress of the fetch
      */
     progress: FetchProgress;
 };
-declare type HydrationProgressOpts = CommonProgressOpts & {
+type HydrationProgressOpts = CommonProgressOpts & {
     /**
      * The current progress of the database hydration
      */
     progress: HydrationProgress;
 };
-declare type HydrationDoneOpts = CommonProgressOpts;
+type HydrationDoneOpts = CommonProgressOpts;
 /**
  * Events that may be triggered  by the LocalDatabase emitter
  */
@@ -56,7 +55,7 @@ interface DatabaseEvents {
      */
     hydrationDone: (opts: HydrationDoneOpts) => void;
 }
-declare type Emitter = StrictEventEmitter<EventEmitter, DatabaseEvents>;
+type Emitter = StrictEventEmitter<EventEmitter, DatabaseEvents>;
 /**
  * The local database is responsible for syncing the remote rekordbox databases
  * of media slots on a device into in-memory sqlite databases.

@@ -1,6 +1,5 @@
-/// <reference types="node" />
 import { Span } from '@sentry/tracing';
-import { Device } from "../types";
+import { Device } from 'src/types';
 import { fetchFile as fetchFileCall } from './programs';
 import { RetryConfig } from './rpc';
 export interface FetchProgress {
@@ -21,6 +20,7 @@ interface FetchFileOptions {
     path: string;
     onProgress?: Parameters<typeof fetchFileCall>[2];
     span?: Span;
+    chunkSize?: number;
 }
 /**
  * Fetch a file from a devices NFS server.
@@ -30,7 +30,7 @@ interface FetchFileOptions {
  *       important that when the device disconnects you call the {@link
  *       resetDeviceCache} function.
  */
-export declare function fetchFile({ device, slot, path, onProgress, span, }: FetchFileOptions): Promise<Buffer>;
+export declare function fetchFile({ device, slot, path, onProgress, span, chunkSize }: FetchFileOptions): Promise<Buffer<ArrayBuffer>>;
 /**
  * Clear the cached NFS connection and root filehandle for the given device
  */

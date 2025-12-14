@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/node';
+import * as Telemetry from 'src/utils/telemetry';
 import {Span} from '@sentry/tracing';
 
 import {Track} from 'src/entities';
@@ -88,7 +88,7 @@ export async function viaLocal(
       chunkSize: CHUNK_SIZE
     });
   } catch (error) {
-    Sentry.captureException(error);
+    Telemetry.captureException(error);
     return null;
   }
 }

@@ -1,4 +1,4 @@
-import { EntityFK, Playlist, PlaylistEntry, Track } from "../entities";
+import { EntityFK, Playlist, PlaylistEntry, Track } from 'src/entities';
 /**
  * Table names availble
  */

@@ -1,4 +1,4 @@
-import { Device, MediaSlot } from "../types";
+import { Device, MediaSlot } from 'src/types';
 interface Options {
     /**
      * The device asking for media info
@@ -18,5 +18,5 @@ interface Options {
  * Get information about the media connected to the specifed slot on the
  * device.
  */
-export declare const makeMediaSlotRequest: ({ hostDevice, device, slot }: Options) => Uint8Array;
+export declare const makeMediaSlotRequest: ({ hostDevice, device, slot }: Options) => Uint8Array<ArrayBuffer>;
 export {};
