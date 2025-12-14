@@ -92,13 +92,13 @@ export async function bringOnline(config?: NetworkConfig) {
   const tx = Telemetry.startTransaction({name: 'bringOnline'});
 
   // Socket used to listen for devices on the network
-  const announceSocket = dgram.createSocket('udp4');
+  const announceSocket = dgram.createSocket({type: 'udp4', reuseAddr: true});
 
   // Socket used to listen for beat timing information
-  const beatSocket = dgram.createSocket('udp4');
+  const beatSocket = dgram.createSocket({type: 'udp4', reuseAddr: true});
 
   // Socket used to listen for status packets
-  const statusSocket = dgram.createSocket('udp4');
+  const statusSocket = dgram.createSocket({type: 'udp4', reuseAddr: true});
 
   try {
     await udpBind(announceSocket, ANNOUNCE_PORT, '0.0.0.0');
