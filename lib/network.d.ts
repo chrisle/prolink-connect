@@ -1,15 +1,13 @@
-/// <reference types="node" />
-/// <reference types="node" />
 import { Socket } from 'dgram';
 import { NetworkInterfaceInfoIPv4 } from 'os';
-import Control from "./control";
-import Database from "./db";
-import DeviceManager from "./devices";
-import LocalDatabase from "./localdb";
-import { MixstatusProcessor } from "./mixstatus";
-import RemoteDatabase from "./remotedb";
-import StatusEmitter from "./status";
-import { NetworkState } from "./types";
+import Control from 'src/control';
+import Database from 'src/db';
+import DeviceManager from 'src/devices';
+import LocalDatabase from 'src/localdb';
+import { MixstatusProcessor } from 'src/mixstatus';
+import RemoteDatabase from 'src/remotedb';
+import StatusEmitter from 'src/status';
+import { NetworkState } from 'src/types';
 export interface NetworkConfig {
     /**
      * The network interface to listen for devices on the network over
@@ -46,8 +44,8 @@ interface ConstructOpts {
 /**
  * Services that are not accessible until connected
  */
-declare type ConnectedServices = 'statusEmitter' | 'control' | 'db' | 'localdb' | 'remotedb' | 'mixstatus';
-export declare type ConnectedProlinkNetwork = ProlinkNetwork & {
+type ConnectedServices = 'statusEmitter' | 'control' | 'db' | 'localdb' | 'remotedb' | 'mixstatus';
+export type ConnectedProlinkNetwork = ProlinkNetwork & {
     [P in ConnectedServices]: NonNullable<ProlinkNetwork[P]>;
 } & {
     state: NetworkState.Connected;
@@ -89,7 +87,11 @@ export declare class ProlinkNetwork {
     /**
      * Disconnect from the network
      */
-    disconnect(): Promise<[unknown, unknown, unknown]>;
+    disconnect(): () => Promise<[unknown, unknown, unknown]>;
+    /**
+     * Close UDP sockets.
+     */
+    close(): Promise<[unknown, unknown, unknown]>;
     /**
      * Get the current NetworkState of the network.
      *

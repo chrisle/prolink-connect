@@ -1,6 +1,6 @@
 {
   "name": "prolink-connect",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "main": "lib/index.js",
   "author": "Evan Purkhiser <evanpurkhiser@gmail.com>",
   "keywords": [
@@ -20,7 +20,8 @@
     "test": "jest",
     "lint": "eslint src/**/*.ts tests/**/*.ts",
     "preversion": "yarn lint; yarn test",
-    "prepare": "ts-patch install -s"
+    "prepare": "ts-patch install -s && npm run build",
+    "prepublishOnly": "npm run build"
   },
   "files": [
     "lib/"

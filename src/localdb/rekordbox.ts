@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/node';
+import * as Telemetry from 'src/utils/telemetry';
 import {Span} from '@sentry/tracing';
 import {KaitaiStream} from 'kaitai-struct';
 
@@ -180,7 +180,7 @@ class RekordboxHydrator {
   async hydrateFromPdb(pdbData: Buffer, span?: Span) {
     const tx = span
       ? span.startChild({op: 'hydrateFromPdb'})
-      : Sentry.startTransaction({name: 'hydrateFromPdb'});
+      : Telemetry.startTransaction({name: 'hydrateFromPdb'});
 
     const parseTx = tx.startChild({op: 'parsePdbData', data: {size: pdbData.length}});
     const stream = new KaitaiStream(pdbData);

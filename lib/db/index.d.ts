@@ -1,10 +1,9 @@
-/// <reference types="node" />
-import DeviceManager from "../devices";
-import { Track } from "../entities";
-import LocalDatabase from "../localdb";
-import RemoteDatabase from "../remotedb";
-import { Device, PlaylistContents, Waveforms } from "../types";
-import * as GetArtwork from './getArtwork';
+import DeviceManager from 'src/devices';
+import { Track } from 'src/entities';
+import LocalDatabase from 'src/localdb';
+import RemoteDatabase from 'src/remotedb';
+import { Device, PlaylistContents, Waveforms } from 'src/types';
+import * as GetArtworkThumbnail from './getArtworkThumbnail';
 import * as GetMetadata from './getMetadata';
 import * as GetPlaylist from './getPlaylist';
 /**
@@ -23,15 +22,19 @@ declare class Database {
     /**
      * Retrieve metadata for a track on a specfic device slot.
      */
-    getMetadata(opts: GetMetadata.Options): Promise<Track<import("../entities").EntityFK.WithRelations> | null>;
+    getMetadata(opts: GetMetadata.Options): Promise<Track | null>;
+    /**
+     * Retrives the file off a specific device slot.
+     */
+    getFile(opts: GetArtworkThumbnail.Options): Promise<Buffer<ArrayBufferLike> | null>;
     /**
      * Retrives the artwork for a track on a specific device slot.
      */
-    getArtwork(opts: GetArtwork.Options): Promise<Buffer | null>;
+    getArtworkThumbnail(opts: GetArtworkThumbnail.Options): Promise<Buffer<ArrayBufferLike> | null>;
     /**
      * Retrives the waveforms for a track on a specific device slot.
      */
-    getWaveforms(opts: GetArtwork.Options): Promise<Waveforms | null>;
+    getWaveforms(opts: GetArtworkThumbnail.Options): Promise<Waveforms | null>;
     /**
      * Retrieve folders, playlists, and tracks within the playlist tree. The id
      * may be left undefined to query the root of the playlist tree.

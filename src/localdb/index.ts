@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/node';
+import * as Telemetry from 'src/utils/telemetry';
 import {Mutex} from 'async-mutex';
 import StrictEventEmitter from 'strict-event-emitter-types';
 
@@ -174,7 +174,7 @@ class LocalDatabase {
    * Downloads and hydrates a new in-memory sqlite database
    */
   #hydrateDatabase = async (device: Device, slot: DatabaseSlot, media: MediaSlotInfo) => {
-    const tx = Sentry.startTransaction({name: 'hydrateDatabase'});
+    const tx = Telemetry.startTransaction({name: 'hydrateDatabase'});
 
     tx.setTag('slot', getSlotName(media.slot));
     tx.setData('numTracks', media.trackCount.toString());

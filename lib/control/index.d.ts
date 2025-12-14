@@ -1,6 +1,5 @@
-/// <reference types="node" />
 import { Socket } from 'dgram';
-import { CDJStatus, Device } from "../types";
+import { CDJStatus, Device } from 'src/types';
 interface Options {
     hostDevice: Device;
     device: Device;
@@ -9,7 +8,7 @@ interface Options {
 /**
  * Generates the packet used to control the playstate of CDJs
  */
-export declare const makePlaystatePacket: ({ hostDevice, device, playState }: Options) => Uint8Array;
+export declare const makePlaystatePacket: ({ hostDevice, device, playState }: Options) => Uint8Array<ArrayBuffer>;
 export default class Control {
     #private;
     constructor(beatSocket: Socket, hostDevice: Device);

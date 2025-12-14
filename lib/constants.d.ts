@@ -24,7 +24,7 @@ export declare const ANNOUNCE_INTERVAL = 1500;
 /**
  * All UDP packets on the PRO DJ LINK network start with this magic header.
  */
-export declare const PROLINK_HEADER: Uint8Array;
+export declare const PROLINK_HEADER: Uint8Array<ArrayBuffer>;
 /**
  * VirtualCDJName is the name given to the Virtual CDJ device.
  */

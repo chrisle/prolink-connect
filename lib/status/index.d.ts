@@ -1,9 +1,7 @@
-/// <reference types="node" />
-/// <reference types="node" />
 import StrictEventEmitter from 'strict-event-emitter-types';
 import { Socket } from 'dgram';
 import { EventEmitter } from 'events';
-import { CDJStatus, MediaSlotInfo } from "../types";
+import { CDJStatus, MediaSlotInfo } from 'src/types';
 import { makeMediaSlotRequest } from './media';
 interface StatusEvents {
     /**
@@ -15,8 +13,8 @@ interface StatusEvents {
      */
     mediaSlot: (info: MediaSlotInfo) => void;
 }
-declare type Emitter = StrictEventEmitter<EventEmitter, StatusEvents>;
-declare type MediaSlotOptions = Parameters<typeof makeMediaSlotRequest>[0];
+type Emitter = StrictEventEmitter<EventEmitter, StatusEvents>;
+type MediaSlotOptions = Parameters<typeof makeMediaSlotRequest>[0];
 /**
  * The status emitter will report every time a device status is recieved
  */

@@ -88,7 +88,7 @@ export declare enum Response {
 /**
  * Request message types, only sent to the device.
  */
-export declare type Request = ControlRequest | MenuRequest | DataRequest;
+export type Request = ControlRequest | MenuRequest | DataRequest;
 export declare const Request: {
     readonly [x: number]: string;
     readonly GetMetadata: DataRequest.GetMetadata;
@@ -150,7 +150,7 @@ export declare const Request: {
 /**
  * All Known message types. These are used for both request and response messages.
  */
-export declare type MessageType = ControlRequest | MenuRequest | DataRequest | Response;
+export type MessageType = ControlRequest | MenuRequest | DataRequest | Response;
 export declare const MessageType: {
     readonly [x: number]: string;
     readonly Success: Response.Success;

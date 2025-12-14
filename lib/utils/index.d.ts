@@ -1,7 +1,6 @@
-/// <reference types="node" />
 import * as ip from 'ip-address';
 import { NetworkInterfaceInfoIPv4 } from 'os';
-import { Device, MediaSlot, TrackType } from "../types";
+import { Device, MediaSlot, TrackType } from 'src/types';
 /**
  * Get the byte representation of the device name
  */

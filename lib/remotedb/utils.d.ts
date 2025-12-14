@@ -4,7 +4,7 @@ import { Message } from './message';
 import { Connection, LookupDescriptor } from '.';
 export declare const fieldFromDescriptor: ({ hostDevice, menuTarget, trackSlot, trackType, }: LookupDescriptor) => {
     value: number;
-    readonly buffer: Buffer;
+    get buffer(): Buffer<ArrayBuffer>;
     data: Buffer;
     constructor: typeof import("./fields").BaseField;
 };
@@ -14,7 +14,10 @@ export declare const makeRenderMessage: (descriptor: LookupDescriptor, offset: n
  * request.
  */
 export declare function renderItems<T extends ItemType = ItemType>(conn: Connection, descriptor: LookupDescriptor, total: number, span: Span): AsyncGenerator<Items[T], void, unknown>;
+declare const colors: readonly [ItemType.ColorNone, ItemType.ColorPink, ItemType.ColorRed, ItemType.ColorOrange, ItemType.ColorYellow, ItemType.ColorGreen, ItemType.ColorAqua, ItemType.ColorBlue, ItemType.ColorPurple];
+type ColorType = (typeof colors)[number];
 /**
  * Locate the color item in an item list
  */
-export declare const findColor: (items: Array<Items[ItemType]>) => import("./message/item").Item<ItemType.ColorNone> | import("./message/item").Item<ItemType.ColorPink> | import("./message/item").Item<ItemType.ColorRed> | import("./message/item").Item<ItemType.ColorOrange> | import("./message/item").Item<ItemType.ColorYellow> | import("./message/item").Item<ItemType.ColorGreen> | import("./message/item").Item<ItemType.ColorAqua> | import("./message/item").Item<ItemType.ColorBlue> | import("./message/item").Item<ItemType.ColorPurple>;
+export declare const findColor: (items: Array<Items[ItemType]>) => Items[ColorType];
+export {};

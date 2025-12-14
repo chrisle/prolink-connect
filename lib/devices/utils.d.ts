@@ -1,5 +1,4 @@
-/// <reference types="node" />
-import { Device } from "../types";
+import { Device } from 'src/types';
 /**
  * Converts a announce packet to a device object.
  */

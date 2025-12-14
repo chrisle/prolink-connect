@@ -1,8 +1,7 @@
-/// <reference types="node" />
 import { Socket } from 'dgram';
 import { NetworkInterfaceInfoIPv4 } from 'os';
-import DeviceManager from "../devices";
-import { Device, DeviceID } from "../types";
+import DeviceManager from 'src/devices';
+import { Device, DeviceID } from 'src/types';
 /**
  * Constructs a virtual CDJ Device.
  */

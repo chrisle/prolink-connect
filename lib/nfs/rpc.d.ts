@@ -1,5 +1,3 @@
-/// <reference types="node" />
-/// <reference types="node" />
 import { Mutex } from 'async-mutex';
 import { OperationOptions } from 'retry';
 import { Socket } from 'dgram';
@@ -15,7 +13,7 @@ interface RpcCall {
  *
  * @see https://www.npmjs.com/package/promise-retry#promiseretryfn-options
  */
-export declare type RetryConfig = OperationOptions & {
+export type RetryConfig = OperationOptions & {
     /**
      * Time in milliseconds to wait before a RPC transaction should timeout.
      * @default 1000
@@ -41,10 +39,10 @@ export declare class RpcConnection {
      * If a transaction does not complete after the configured timeout it will be
      * retried with the retry configuration.
      */
-    call({ port, ...call }: RpcCall): Promise<Buffer>;
+    call({ port, ...call }: RpcCall): Promise<Buffer<ArrayBufferLike>>;
     disconnect(): Promise<void>;
 }
-declare type RpcProgramCall = Pick<RpcCall, 'procedure' | 'data'>;
+type RpcProgramCall = Pick<RpcCall, 'procedure' | 'data'>;
 /**
  * RpcProgram is constructed with specialization details for a specific RPC
  * program. This should be used to avoid having to repeat yourself for calls
@@ -56,7 +54,7 @@ export declare class RpcProgram {
     port: number;
     conn: RpcConnection;
     constructor(conn: RpcConnection, program: number, version: number, port: number);
-    call(data: RpcProgramCall): Promise<Buffer>;
+    call(data: RpcProgramCall): Promise<Buffer<ArrayBufferLike>>;
     disconnect(): void;
 }
 export {};
