@@ -36,6 +36,7 @@
   "dependencies": {
     "@sentry/node": "^6.4.1",
     "@sentry/tracing": "^6.4.1",
+    "lru_map": "^0.4.1",
     "@types/lodash": "^4.14.186",
     "@types/node": "*",
     "@types/promise-retry": "^1.1.3",
