@@ -1,1 +1,0 @@
-- When working on ideas avoid referencing specific code in the repo because that code might change by the time we attempt to implement the idea.
