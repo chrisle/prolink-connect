@@ -158,3 +158,63 @@ export function positionFromPacket(packet: Buffer): CDJStatus.PositionState | un
 
   return position;
 }
+
+/**
+ * Parse on-air status packet from DJM mixer.
+ * The mixer broadcasts which channels are currently audible.
+ * Supports both 4-channel (subtype 0x00) and 6-channel (subtype 0x03) variants.
+ *
+ * Packet structure:
+ * - 4-channel: subtype 0x00, length 0x0009 (9 data bytes: F1 F2 F3 F4 00 00 00 00 00)
+ * - 6-channel: subtype 0x03, length 0x0011 (17 data bytes: F1 F2 F3 F4 00 00 00 00 00 F5 F6 00 30 00 00 00 00 00)
+ */
+export function onAirFromPacket(packet: Buffer): CDJStatus.OnAirStatus | undefined {
+  if (packet.indexOf(PROLINK_HEADER) !== 0) {
+    return undefined;
+  }
+
+  const subtype = packet[0x20];
+  const lenr = packet.readUInt16BE(0x22);
+
+  // Check for 4-channel variant (subtype 0x00, length 0x0009)
+  if (subtype === 0x00 && lenr === 0x0009 && packet.length >= 0x2e) {
+    const deviceId = packet[0x21];
+    const channels = {
+      1: packet[0x24] !== 0x00,
+      2: packet[0x25] !== 0x00,
+      3: packet[0x26] !== 0x00,
+      4: packet[0x27] !== 0x00,
+    };
+
+    const onAir: CDJStatus.OnAirStatus = {
+      deviceId,
+      channels,
+      isSixChannel: false,
+    };
+
+    return onAir;
+  }
+
+  // Check for 6-channel variant (subtype 0x03, length 0x0011)
+  if (subtype === 0x03 && lenr === 0x0011 && packet.length >= 0x36) {
+    const deviceId = packet[0x21];
+    const channels = {
+      1: packet[0x24] !== 0x00,
+      2: packet[0x25] !== 0x00,
+      3: packet[0x26] !== 0x00,
+      4: packet[0x27] !== 0x00,
+      5: packet[0x2e] !== 0x00,
+      6: packet[0x2f] !== 0x00,
+    };
+
+    const onAir: CDJStatus.OnAirStatus = {
+      deviceId,
+      channels,
+      isSixChannel: true,
+    };
+
+    return onAir;
+  }
+
+  return undefined;
+}

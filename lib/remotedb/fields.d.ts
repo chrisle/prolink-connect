@@ -70,7 +70,7 @@ export declare const UInt8: {
         constructor: typeof BaseField;
     };
     type: NumberFieldType;
-    bytesToRead: 1 | 4 | 2;
+    bytesToRead: 1 | 2 | 4;
 };
 /**
  * Field representing a UInt16
@@ -86,7 +86,7 @@ export declare const UInt16: {
         constructor: typeof BaseField;
     };
     type: NumberFieldType;
-    bytesToRead: 1 | 4 | 2;
+    bytesToRead: 1 | 2 | 4;
 };
 /**
  * Field representing a UInt32
@@ -102,7 +102,7 @@ export declare const UInt32: {
         constructor: typeof BaseField;
     };
     type: NumberFieldType;
-    bytesToRead: 1 | 4 | 2;
+    bytesToRead: 1 | 2 | 4;
 };
 /**
  * Field representing a null-terminated big endian UTF-16 string
@@ -136,7 +136,7 @@ declare const fieldMap: {
             constructor: typeof BaseField;
         };
         type: NumberFieldType;
-        bytesToRead: 1 | 4 | 2;
+        bytesToRead: 1 | 2 | 4;
     };
     readonly 16: {
         new (value: number | Buffer): {
@@ -149,7 +149,7 @@ declare const fieldMap: {
             constructor: typeof BaseField;
         };
         type: NumberFieldType;
-        bytesToRead: 1 | 4 | 2;
+        bytesToRead: 1 | 2 | 4;
     };
     readonly 17: {
         new (value: number | Buffer): {
@@ -162,7 +162,7 @@ declare const fieldMap: {
             constructor: typeof BaseField;
         };
         type: NumberFieldType;
-        bytesToRead: 1 | 4 | 2;
+        bytesToRead: 1 | 2 | 4;
     };
     readonly 20: typeof Binary;
     readonly 38: typeof String;

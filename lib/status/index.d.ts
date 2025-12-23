@@ -12,6 +12,10 @@ interface StatusEvents {
      * Fired when the CDJ reports its media slot status
      */
     mediaSlot: (info: MediaSlotInfo) => void;
+    /**
+     * Fired when the mixer broadcasts on-air channel status
+     */
+    onAir: (status: CDJStatus.OnAirStatus) => void;
 }
 type Emitter = StrictEventEmitter<EventEmitter, StatusEvents>;
 type MediaSlotOptions = Parameters<typeof makeMediaSlotRequest>[0];
