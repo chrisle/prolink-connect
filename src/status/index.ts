@@ -9,7 +9,7 @@ import {CDJStatus, MediaSlotInfo} from 'src/types';
 import {udpSend} from 'src/utils/udp';
 
 import {makeMediaSlotRequest} from './media';
-import {mediaSlotFromPacket, statusFromPacket} from './utils';
+import {mediaSlotFromPacket, statusFromPacket, onAirFromPacket} from './utils';
 
 interface StatusEvents {
   /**
@@ -20,6 +20,10 @@ interface StatusEvents {
    * Fired when the CDJ reports its media slot status
    */
   mediaSlot: (info: MediaSlotInfo) => void;
+  /**
+   * Fired when the mixer broadcasts on-air channel status
+   */
+  onAir: (status: CDJStatus.OnAirStatus) => void;
 }
 
 type Emitter = StrictEventEmitter<EventEmitter, StatusEvents>;
@@ -65,6 +69,13 @@ class StatusEmitter {
 
     if (mediaSlot !== undefined) {
       return this.#emitter.emit('mediaSlot', mediaSlot);
+    }
+
+    // On-air status from mixer is also reported on this socket
+    const onAir = onAirFromPacket(message);
+
+    if (onAir !== undefined) {
+      return this.#emitter.emit('onAir', onAir);
     }
 
     return undefined;
