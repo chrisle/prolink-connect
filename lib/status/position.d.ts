@@ -1,6 +1,6 @@
+import StrictEventEmitter from 'strict-event-emitter-types';
 import { Socket } from 'dgram';
 import { EventEmitter } from 'events';
-import StrictEventEmitter from 'strict-event-emitter-types';
 import { CDJStatus } from 'src/types';
 interface PositionEvents {
     /**
