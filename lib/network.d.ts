@@ -7,6 +7,7 @@ import LocalDatabase from 'src/localdb';
 import { MixstatusProcessor } from 'src/mixstatus';
 import RemoteDatabase from 'src/remotedb';
 import StatusEmitter from 'src/status';
+import PositionEmitter from 'src/status/position';
 import { NetworkState } from 'src/types';
 export interface NetworkConfig {
     /**
@@ -40,11 +41,12 @@ interface ConstructOpts {
     statusSocket: Socket;
     deviceManager: DeviceManager;
     statusEmitter: StatusEmitter;
+    positionEmitter: PositionEmitter;
 }
 /**
  * Services that are not accessible until connected
  */
-type ConnectedServices = 'statusEmitter' | 'control' | 'db' | 'localdb' | 'remotedb' | 'mixstatus';
+type ConnectedServices = 'statusEmitter' | 'positionEmitter' | 'control' | 'db' | 'localdb' | 'remotedb' | 'mixstatus';
 export type ConnectedProlinkNetwork = ProlinkNetwork & {
     [P in ConnectedServices]: NonNullable<ProlinkNetwork[P]>;
 } & {
@@ -62,7 +64,7 @@ export declare class ProlinkNetwork {
     /**
      * @internal
      */
-    constructor({ config, announceSocket, beatSocket, statusSocket, deviceManager, statusEmitter, }: ConstructOpts);
+    constructor({ config, announceSocket, beatSocket, statusSocket, deviceManager, statusEmitter, positionEmitter, }: ConstructOpts);
     /**
      * Configure / reconfigure the network with an explicit configuration.
      *
@@ -124,6 +126,15 @@ export declare class ProlinkNetwork {
      * status updates on each CDJ.
      */
     get statusEmitter(): StatusEmitter | null;
+    /**
+     * Get the {@link PositionEmitter} service. This service provides events with
+     * absolute playhead position updates from CDJ-3000+ devices.
+     *
+     * Position packets are sent approximately every 30ms while a track is loaded,
+     * providing precise position tracking independent of beat grids. This enables
+     * accurate timecode/video sync even during scratching, reverse play, and loops.
+     */
+    get positionEmitter(): PositionEmitter | null;
     /**
      * Get the {@link Control} service. This service can be used to control the
      * Playstate of CDJs on the network.

@@ -13,6 +13,7 @@ import LocalDatabase from 'src/localdb';
 import {MixstatusProcessor} from 'src/mixstatus';
 import RemoteDatabase from 'src/remotedb';
 import StatusEmitter from 'src/status';
+import PositionEmitter from 'src/status/position';
 import {Device, NetworkState} from 'src/types';
 import {getMatchingInterface} from 'src/utils';
 import {udpBind, udpClose} from 'src/utils/udp';
@@ -62,6 +63,7 @@ interface ConstructOpts {
   statusSocket: Socket;
   deviceManager: DeviceManager;
   statusEmitter: StatusEmitter;
+  positionEmitter: PositionEmitter;
 }
 
 /**
@@ -69,6 +71,7 @@ interface ConstructOpts {
  */
 type ConnectedServices =
   | 'statusEmitter'
+  | 'positionEmitter'
   | 'control'
   | 'db'
   | 'localdb'
@@ -114,6 +117,7 @@ export async function bringOnline(config?: NetworkConfig) {
 
   const deviceManager = new DeviceManager(announceSocket);
   const statusEmitter = new StatusEmitter(statusSocket);
+  const positionEmitter = new PositionEmitter(beatSocket);
 
   tx.finish();
 
@@ -124,6 +128,7 @@ export async function bringOnline(config?: NetworkConfig) {
     statusSocket,
     deviceManager,
     statusEmitter,
+    positionEmitter,
   });
 
   return network;
@@ -137,6 +142,7 @@ export class ProlinkNetwork {
   #statusSocket: Socket;
   #deviceManager: DeviceManager;
   #statusEmitter: StatusEmitter;
+  #positionEmitter: PositionEmitter;
 
   #config: null | NetworkConfig;
   #connection: null | ConnectionService;
@@ -152,6 +158,7 @@ export class ProlinkNetwork {
     statusSocket,
     deviceManager,
     statusEmitter,
+    positionEmitter,
   }: ConstructOpts) {
     this.#config = config ?? null;
 
@@ -160,6 +167,7 @@ export class ProlinkNetwork {
     this.#statusSocket = statusSocket;
     this.#deviceManager = deviceManager;
     this.#statusEmitter = statusEmitter;
+    this.#positionEmitter = positionEmitter;
 
     this.#connection = null;
     this.#mixstatus = null;
@@ -325,6 +333,18 @@ export class ProlinkNetwork {
     // network to be Connected, it does not make sense to use it unless it is. So
     // we artificially return null if we are not connected
     return this.#state === NetworkState.Connected ? this.#statusEmitter : null;
+  }
+
+  /**
+   * Get the {@link PositionEmitter} service. This service provides events with
+   * absolute playhead position updates from CDJ-3000+ devices.
+   *
+   * Position packets are sent approximately every 30ms while a track is loaded,
+   * providing precise position tracking independent of beat grids. This enables
+   * accurate timecode/video sync even during scratching, reverse play, and loops.
+   */
+  get positionEmitter() {
+    return this.#state === NetworkState.Connected ? this.#positionEmitter : null;
   }
 
   /**

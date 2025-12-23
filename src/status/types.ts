@@ -113,3 +113,33 @@ export interface State {
    */
   packetNum: number;
 }
+
+/**
+ * Absolute position information from CDJ-3000+ devices.
+ * Sent every 30ms on port 50001 while a track is loaded.
+ * Provides precise playhead position independent of beat grid.
+ */
+export interface PositionState {
+  /**
+   * The device ID sending this position update.
+   */
+  deviceId: number;
+  /**
+   * Track length in seconds (rounded down to nearest second).
+   */
+  trackLength: number;
+  /**
+   * Absolute playhead position in milliseconds.
+   */
+  playhead: number;
+  /**
+   * Pitch slider value as shown on screen.
+   * For example, 3.26% is represented as 3.26.
+   */
+  pitch: number;
+  /**
+   * Effective BPM (track BPM adjusted by pitch) as shown on screen.
+   * null if BPM is unknown.
+   */
+  bpm: number | null;
+}
