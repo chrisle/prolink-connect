@@ -1,6 +1,3 @@
-import * as Telemetry from 'src/utils/telemetry';
-import {SpanStatus} from 'src/utils/telemetry';
-
 import {randomUUID} from 'crypto';
 import dgram, {Socket} from 'dgram';
 import {NetworkInterfaceInfoIPv4} from 'os';
@@ -16,6 +13,8 @@ import StatusEmitter from 'src/status';
 import PositionEmitter from 'src/status/position';
 import {Device, NetworkState} from 'src/types';
 import {getMatchingInterface} from 'src/utils';
+import * as Telemetry from 'src/utils/telemetry';
+import {SpanStatus} from 'src/utils/telemetry';
 import {udpBind, udpClose} from 'src/utils/udp';
 import {Announcer, getVirtualCDJ} from 'src/virtualcdj';
 
@@ -46,6 +45,16 @@ export interface NetworkConfig {
    * restriction.
    */
   vcdjId: number;
+  /**
+   * Enable full startup protocol for robust device negotiation.
+   * When enabled, the virtual CDJ will go through the complete startup
+   * sequence (stages 0x0a → 0x00 → 0x02 → 0x04 → 0x06) before regular
+   * keep-alive announcements.
+   *
+   * This is recommended for production setups with CDJ-3000 and DJM-V10
+   * hardware to ensure proper device discovery and network stability.
+   */
+  fullStartup?: boolean;
 }
 
 interface ConnectionService {
@@ -235,7 +244,13 @@ export class ProlinkNetwork {
     const vcdj = getVirtualCDJ(this.#config.iface, this.#config.vcdjId);
 
     // Start announcing
-    const announcer = new Announcer(vcdj, this.#announceSocket, this.deviceManager);
+    const announcer = new Announcer(
+      vcdj,
+      this.#announceSocket,
+      this.deviceManager,
+      this.#config.iface,
+      this.#config.fullStartup ?? false
+    );
     announcer.start();
 
     // Create remote and local databases
