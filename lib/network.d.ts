@@ -33,6 +33,16 @@ export interface NetworkConfig {
      * restriction.
      */
     vcdjId: number;
+    /**
+     * Enable full startup protocol for robust device negotiation.
+     * When enabled, the virtual CDJ will go through the complete startup
+     * sequence (stages 0x0a → 0x00 → 0x02 → 0x04 → 0x06) before regular
+     * keep-alive announcements.
+     *
+     * This is recommended for production setups with CDJ-3000 and DJM-V10
+     * hardware to ensure proper device discovery and network stability.
+     */
+    fullStartup?: boolean;
 }
 interface ConstructOpts {
     config?: NetworkConfig;

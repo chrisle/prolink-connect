@@ -23,7 +23,7 @@ export declare function makeAnnouncePacket(deviceToAnnounce: Device): Uint8Array
  */
 export declare class Announcer {
     #private;
-    constructor(vcdj: Device, announceSocket: Socket, deviceManager: DeviceManager);
+    constructor(vcdj: Device, announceSocket: Socket, deviceManager: DeviceManager, iface: NetworkInterfaceInfoIPv4, fullStartup?: boolean);
     start(): void;
     stop(): void;
 }
