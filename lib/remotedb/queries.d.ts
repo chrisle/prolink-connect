@@ -1,5 +1,5 @@
-import { TelemetrySpan as Span } from "../utils/telemetry";
 import * as entities from "../entities";
+import { TelemetrySpan as Span } from "../utils/telemetry";
 import { Item, ItemType } from './message/item';
 import { Connection, LookupDescriptor, Query } from '.';
 /**

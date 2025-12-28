@@ -1,9 +1,9 @@
-import { TelemetrySpan as Span } from "../utils/telemetry";
 import { Mutex } from 'async-mutex';
 import PromiseSocket from 'promise-socket';
 import { Socket } from 'net';
 import DeviceManager from "../devices";
 import { Device, DeviceID, MediaSlot, TrackType } from "../types";
+import { TelemetrySpan as Span } from "../utils/telemetry";
 import { Response } from './message/types';
 import { Message } from './message';
 import { HandlerArgs, HandlerReturn, queryHandlers } from './queries';

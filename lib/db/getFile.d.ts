@@ -1,8 +1,8 @@
-import { TelemetrySpan as Span } from "../utils/telemetry";
 import { Track } from "../entities";
 import LocalDatabase from "../localdb";
 import RemoteDatabase from "../remotedb";
 import { Device, DeviceID, MediaSlot, TrackType } from "../types";
+import { TelemetrySpan as Span } from "../utils/telemetry";
 export interface Options {
     /**
      * The device to query the file off of

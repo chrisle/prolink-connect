@@ -1,5 +1,5 @@
-import { TelemetrySpan as Span } from "../utils/telemetry";
 import { Device } from "../types";
+import { TelemetrySpan as Span } from "../utils/telemetry";
 import { fetchFile as fetchFileCall } from './programs';
 import { RetryConfig } from './rpc';
 export interface FetchProgress {

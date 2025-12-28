@@ -1,8 +1,8 @@
-import { TelemetrySpan as Span } from "../utils/telemetry";
 import { Playlist } from "../entities";
 import LocalDatabase from "../localdb";
 import RemoteDatabase from "../remotedb";
 import { DeviceID, MediaSlot, PlaylistContents } from "../types";
+import { TelemetrySpan as Span } from "../utils/telemetry";
 export interface Options {
     /**
      * The playlist or folder to query the entries of. This may be left as

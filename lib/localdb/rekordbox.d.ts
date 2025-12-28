@@ -1,7 +1,7 @@
-import { TelemetrySpan as Span } from "../utils/telemetry";
 import { Track } from "../entities";
 import { MetadataORM } from "./orm";
 import { BeatGrid, CueAndLoop, ExtendedCue, SongStructure, WaveformHD, WaveformPreviewData } from "../types";
+import { TelemetrySpan as Span } from "../utils/telemetry";
 /**
  * The provided function should resolve ANLZ files into buffers. Typically
  * you would just read the file, but in the case of the prolink network, this
