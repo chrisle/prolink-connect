@@ -46,6 +46,14 @@ export interface NetworkConfig {
    */
   vcdjId: number;
   /**
+   * The name to announce the virtual CDJ as on the network.
+   *
+   * This name will appear in device lists on other Pro DJ Link equipment.
+   *
+   * @default 'ProLink-Connect'
+   */
+  vcdjName?: string;
+  /**
    * Enable full startup protocol for robust device negotiation.
    * When enabled, the virtual CDJ will go through the complete startup
    * sequence (stages 0x0a → 0x00 → 0x02 → 0x04 → 0x06) before regular
@@ -241,7 +249,16 @@ export class ProlinkNetwork {
     const tx = Telemetry.startTransaction({name: 'connect'});
 
     // Create VCDJ for the interface's broadcast address
-    const vcdj = getVirtualCDJ(this.#config.iface, this.#config.vcdjId);
+    const vcdj = getVirtualCDJ(
+      this.#config.iface,
+      this.#config.vcdjId,
+      this.#config.vcdjName
+    );
+
+    // Update device manager to filter out our VCDJ name
+    if (this.#config.vcdjName !== undefined) {
+      this.#deviceManager.reconfigure({vcdjName: this.#config.vcdjName});
+    }
 
     // Start announcing
     const announcer = new Announcer(

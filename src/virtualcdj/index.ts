@@ -17,10 +17,18 @@ import {buildName} from 'src/utils';
 
 /**
  * Constructs a virtual CDJ Device.
+ *
+ * @param iface - The network interface to use
+ * @param id - The device ID to use
+ * @param name - Optional custom name (defaults to VIRTUAL_CDJ_NAME constant)
  */
-export const getVirtualCDJ = (iface: NetworkInterfaceInfoIPv4, id: DeviceID): Device => ({
+export const getVirtualCDJ = (
+  iface: NetworkInterfaceInfoIPv4,
+  id: DeviceID,
+  name: string = VIRTUAL_CDJ_NAME
+): Device => ({
   id,
-  name: VIRTUAL_CDJ_NAME,
+  name,
   type: DeviceType.CDJ,
   ip: new ip.Address4(iface.address),
   macAddr: new Uint8Array(iface.mac.split(':').map(s => parseInt(s, 16))),

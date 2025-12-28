@@ -87,8 +87,14 @@ describe('Full Startup Protocol', () => {
         const device = getVirtualCDJ(mockIface, id as any);
         expect(device.id).toBe(id);
         expect(device.type).toBe(DeviceType.CDJ);
-        expect(device.name).toBe('Now Playing');
+        expect(device.name).toBe('ProLink-Connect');
       });
+    });
+
+    it('should accept custom device name', () => {
+      const device = getVirtualCDJ(mockIface, 1, 'My Custom Name');
+      expect(device.id).toBe(1);
+      expect(device.name).toBe('My Custom Name');
     });
   });
 
