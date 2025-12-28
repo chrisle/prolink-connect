@@ -1,7 +1,7 @@
 import { Span } from '@sentry/tracing';
-import LocalDatabase from 'src/localdb';
-import RemoteDatabase from 'src/remotedb';
-import { Device, DeviceID, MediaSlot, TrackType } from 'src/types';
+import LocalDatabase from "../localdb";
+import RemoteDatabase from "../remotedb";
+import { Device, DeviceID, MediaSlot, TrackType } from "../types";
 export interface Options {
     /**
      * The device to query the track metadata from
@@ -16,7 +16,7 @@ export interface Options {
      */
     trackType: TrackType;
     /**
-     * The track id to retrive metadata for
+     * The track id to retrieve metadata for
      */
     trackId: number;
     /**
@@ -24,5 +24,5 @@ export interface Options {
      */
     span?: Span;
 }
-export declare function viaRemote(remote: RemoteDatabase, opts: Required<Options>): Promise<import("src/types").Track<import("..").EntityFK.WithRelations> | null>;
-export declare function viaLocal(local: LocalDatabase, device: Device, opts: Required<Options>): Promise<import("src/types").Track | null>;
+export declare function viaRemote(remote: RemoteDatabase, opts: Required<Options>): Promise<import("../types").Track<import("..").EntityFK.WithRelations> | null>;
+export declare function viaLocal(local: LocalDatabase, device: Device, opts: Required<Options>): Promise<import("../types").Track | null>;

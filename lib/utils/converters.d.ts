@@ -1,4 +1,4 @@
-import { WaveformHD } from 'src/types';
+import { WaveformHD } from "../types";
 /**
  * Extracts a specific bitmask, shifting it to the bitmask.
  */

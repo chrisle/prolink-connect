@@ -4,9 +4,9 @@ import { Message } from './message';
 import { Connection, LookupDescriptor } from '.';
 export declare const fieldFromDescriptor: ({ hostDevice, menuTarget, trackSlot, trackType, }: LookupDescriptor) => {
     value: number;
-    get buffer(): Buffer<ArrayBuffer>;
-    data: Buffer;
+    readonly buffer: Buffer<ArrayBuffer>;
     constructor: typeof import("./fields").BaseField;
+    data: Buffer;
 };
 export declare const makeRenderMessage: (descriptor: LookupDescriptor, offset: number, count: number, total: number) => Message<import("./message/types").ControlRequest.RenderMenu>;
 /**

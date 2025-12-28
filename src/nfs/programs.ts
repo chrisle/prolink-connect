@@ -195,8 +195,9 @@ export async function fetchFile(
   readSize?: number
 ) {
   readSize = readSize || READ_SIZE;
-  if (readSize > 8192)
+  if (readSize > 8192) {
     throw new Error(`Maximum read size for NFS is 8192. You specified: ${readSize}`);
+  }
   const {handle, name, size} = file;
   const data = Buffer.alloc(size);
 

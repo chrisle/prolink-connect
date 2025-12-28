@@ -1,4 +1,4 @@
-import { Field, NumberField, StringField } from 'src/remotedb/fields';
+import { Field, NumberField, StringField } from "../fields";
 /**
  * Item types associated to the MenuItem message type.
  */
@@ -20,7 +20,7 @@ export declare enum ItemType {
     Year = 17,
     Comment = 35,
     HistoryPlaylist = 36,
-    OrigianlArtist = 40,
+    OriginalArtist = 40,
     Remixer = 41,
     DateAdded = 46,
     Unknown01 = 47,

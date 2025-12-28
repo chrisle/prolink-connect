@@ -1,12 +1,12 @@
 import '@sentry/tracing';
 
-import * as Telemetry from 'src/utils/telemetry';
 import signale from 'signale';
+
+import fs from 'fs';
 
 import {MixstatusProcessor} from 'src/mixstatus';
 import {bringOnline} from 'src/network';
-
-import fs from 'fs';
+import * as Telemetry from 'src/utils/telemetry';
 
 Telemetry.init({
   dsn: 'https://36570041fd5a4c05af76456e60a1233a@o126623.ingest.sentry.io/5205486',
@@ -19,7 +19,7 @@ async function cli() {
   signale.success('Network online, preparing to connect');
 
   network.deviceManager.on('connected', d => {
-    signale.star('New device: %s [id: %s]', d.name, d.id)
+    signale.star('New device: %s [id: %s]', d.name, d.id);
   });
 
   signale.await('Autoconfiguring network.. waiting for devices');
@@ -69,7 +69,7 @@ async function cli() {
       deviceId: state.trackDeviceId,
       trackSlot: state.trackSlot,
       trackType: state.trackType,
-      track: track
+      track: track,
     });
     if (buf) {
       fs.writeFileSync(track.fileName, buf, 'binary');
@@ -77,7 +77,6 @@ async function cli() {
     }
 
     // Display the track that was emmited by the network.
-
   });
 
   await new Promise(r => setTimeout(r, 3000));

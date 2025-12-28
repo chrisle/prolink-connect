@@ -1,7 +1,4 @@
-import {describe, expect, it} from 'vitest';
-
 import {onAirFromPacket} from 'src/status/utils';
-import {CDJStatus} from 'src/types';
 
 describe('on-air packet parsing', () => {
   describe('4-channel variant (DJM-900/1000)', () => {

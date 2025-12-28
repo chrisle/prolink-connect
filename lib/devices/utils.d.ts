@@ -1,4 +1,4 @@
-import { Device } from 'src/types';
+import { Device } from "../types";
 /**
  * Converts a announce packet to a device object.
  */

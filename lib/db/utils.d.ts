@@ -1,4 +1,4 @@
-import { Device, MediaSlot } from 'src/types';
+import { Device, MediaSlot } from "../types";
 interface AnlzLoaderOpts {
     device: Device;
     slot: MediaSlot.RB | MediaSlot.USB | MediaSlot.SD;

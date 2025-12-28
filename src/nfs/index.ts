@@ -1,8 +1,8 @@
-import * as Telemetry from 'src/utils/telemetry';
 import {Span} from '@sentry/tracing';
 
 import {Device, DeviceID, MediaSlot} from 'src/types';
 import {getSlotName} from 'src/utils';
+import * as Telemetry from 'src/utils/telemetry';
 
 import {
   fetchFile as fetchFileCall,
@@ -161,7 +161,7 @@ export async function fetchFile({
   path,
   onProgress,
   span,
-  chunkSize
+  chunkSize,
 }: FetchFileOptions) {
   const tx = span
     ? span.startChild({op: 'fetchFile'})

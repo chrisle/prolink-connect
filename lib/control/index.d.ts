@@ -1,5 +1,5 @@
 import { Socket } from 'dgram';
-import { CDJStatus, Device } from 'src/types';
+import { CDJStatus, Device } from "../types";
 interface Options {
     hostDevice: Device;
     device: Device;

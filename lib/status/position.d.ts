@@ -1,7 +1,7 @@
 import StrictEventEmitter from 'strict-event-emitter-types';
 import { Socket } from 'dgram';
 import { EventEmitter } from 'events';
-import { CDJStatus } from 'src/types';
+import { CDJStatus } from "../types";
 interface PositionEvents {
     /**
      * Fired when an absolute position packet is received from a CDJ-3000+.

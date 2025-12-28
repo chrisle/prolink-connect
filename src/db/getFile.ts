@@ -1,13 +1,13 @@
-import * as Telemetry from 'src/utils/telemetry';
 import {Span} from '@sentry/tracing';
 
 import {Track} from 'src/entities';
 import LocalDatabase from 'src/localdb';
 import {fetchFile} from 'src/nfs';
-import RemoteDatabase, {MenuTarget, Query} from 'src/remotedb';
+import RemoteDatabase from 'src/remotedb';
 import {Device, DeviceID, MediaSlot, TrackType} from 'src/types';
+import * as Telemetry from 'src/utils/telemetry';
 
-export type Options = {
+export interface Options {
   /**
    * The device to query the file off of
    */
@@ -28,14 +28,16 @@ export type Options = {
    * The Sentry transaction span
    */
   span?: Span;
-};
+}
 
 const CHUNK_SIZE = 8192; // Maximum allowed XDR read size
 
-export async function viaRemote(remote: RemoteDatabase, device: Device, opts: Required<Options>) {
-  const {deviceId, trackSlot, trackType, track, span} = opts;
-
-  console.error('Getting a file from Rekordbox via ProDJ-Link is not yet supported.')
+export function viaRemote(
+  _remote: RemoteDatabase,
+  _device: Device,
+  _opts: Required<Options>
+): null {
+  console.error('Getting a file from Rekordbox via ProDJ-Link is not yet supported.');
   return null;
 
   // const conn = await remote.get(deviceId);
@@ -82,10 +84,10 @@ export async function viaLocal(
       device,
       slot: trackSlot,
       path: track.filePath,
-      onProgress: (progress) => {
+      onProgress: progress => {
         console.log(progress.read, progress.total);
       },
-      chunkSize: CHUNK_SIZE
+      chunkSize: CHUNK_SIZE,
     });
   } catch (error) {
     Telemetry.captureException(error);

@@ -1,8 +1,8 @@
-import DeviceManager from 'src/devices';
-import { Track } from 'src/entities';
-import LocalDatabase from 'src/localdb';
-import RemoteDatabase from 'src/remotedb';
-import { Device, PlaylistContents, Waveforms } from 'src/types';
+import DeviceManager from "../devices";
+import { Track } from "../entities";
+import LocalDatabase from "../localdb";
+import RemoteDatabase from "../remotedb";
+import { Device, PlaylistContents, Waveforms } from "../types";
 import * as GetArtworkThumbnail from './getArtworkThumbnail';
 import * as GetMetadata from './getMetadata';
 import * as GetPlaylist from './getPlaylist';
@@ -14,25 +14,25 @@ declare class Database {
     #private;
     constructor(hostDevice: Device, local: LocalDatabase, remote: RemoteDatabase, deviceManager: DeviceManager);
     /**
-     * Reports weather or not the CDJs can be communcated to over the remote
+     * Reports weather or not the CDJs can be communicated to over the remote
      * database protocol. This is important when trying to query for unanalyzed or
      * compact disc tracks.
      */
     get cdjSupportsRemotedb(): boolean;
     /**
-     * Retrieve metadata for a track on a specfic device slot.
+     * Retrieve metadata for a track on a specific device slot.
      */
     getMetadata(opts: GetMetadata.Options): Promise<Track | null>;
     /**
-     * Retrives the file off a specific device slot.
+     * Retrieves the file off a specific device slot.
      */
     getFile(opts: GetArtworkThumbnail.Options): Promise<Buffer<ArrayBufferLike> | null>;
     /**
-     * Retrives the artwork for a track on a specific device slot.
+     * Retrieves the artwork for a track on a specific device slot.
      */
     getArtworkThumbnail(opts: GetArtworkThumbnail.Options): Promise<Buffer<ArrayBufferLike> | null>;
     /**
-     * Retrives the waveforms for a track on a specific device slot.
+     * Retrieves the waveforms for a track on a specific device slot.
      */
     getWaveforms(opts: GetArtworkThumbnail.Options): Promise<Waveforms | null>;
     /**

@@ -1,9 +1,9 @@
 import StrictEventEmitter from 'strict-event-emitter-types';
 import { EventEmitter } from 'events';
-import DeviceManager from 'src/devices';
-import { FetchProgress } from 'src/nfs';
-import StatusEmitter from 'src/status';
-import { Device, DeviceID, MediaSlot } from 'src/types';
+import DeviceManager from "../devices";
+import { FetchProgress } from "../nfs";
+import StatusEmitter from "../status";
+import { Device, DeviceID, MediaSlot } from "../types";
 import { MetadataORM } from './orm';
 import { HydrationProgress } from './rekordbox';
 /**
@@ -51,7 +51,7 @@ interface DatabaseEvents {
      *
      * There is a period of time between hydrationProgress reporting 100% copletion,
      * and the database being flushed, so it may be useful to wait for this event
-     * before considering the databas to be fully hydrated.
+     * before considering the database to be fully hydrated.
      */
     hydrationDone: (opts: HydrationDoneOpts) => void;
 }

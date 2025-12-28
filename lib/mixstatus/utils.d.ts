@@ -1,4 +1,4 @@
-import { CDJStatus } from 'src/types';
+import { CDJStatus } from "../types";
 /**
  * Returns true if the the status reports a playing state.
  */

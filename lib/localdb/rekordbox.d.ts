@@ -1,7 +1,7 @@
 import { Span } from '@sentry/tracing';
-import { Track } from 'src/entities';
-import { MetadataORM } from 'src/localdb/orm';
-import { BeatGrid, CueAndLoop, ExtendedCue, SongStructure, WaveformHD, WaveformPreviewData } from 'src/types';
+import { Track } from "../entities";
+import { MetadataORM } from "./orm";
+import { BeatGrid, CueAndLoop, ExtendedCue, SongStructure, WaveformHD, WaveformPreviewData } from "../types";
 /**
  * The provided function should resolve ANLZ files into buffers. Typically
  * you would just read the file, but in the case of the prolink network, this

@@ -2,14 +2,14 @@ import { Span } from '@sentry/tracing';
 import { Mutex } from 'async-mutex';
 import PromiseSocket from 'promise-socket';
 import { Socket } from 'net';
-import DeviceManager from 'src/devices';
-import { Device, DeviceID, MediaSlot, TrackType } from 'src/types';
+import DeviceManager from "../devices";
+import { Device, DeviceID, MediaSlot, TrackType } from "../types";
 import { Response } from './message/types';
 import { Message } from './message';
 import { HandlerArgs, HandlerReturn, queryHandlers } from './queries';
 type Await<T> = T extends PromiseLike<infer U> ? U : T;
 /**
- * Menu target specifies where a menu should be "rendered" This differes based
+ * Menu target specifies where a menu should be "rendered" This differs based
  * on the request being made.
  */
 export declare enum MenuTarget {
@@ -106,11 +106,11 @@ interface QueryOpts<T extends Query> {
      */
     query: T;
     /**
-     * Arguments to pass to the query. These are query speciifc
+     * Arguments to pass to the query. These are query specific
      */
     args: HandlerArgs<T>;
     /**
-     * The sentry span to assicate the query with
+     * The sentry span to associate the query with
      */
     span?: Span;
 }

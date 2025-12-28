@@ -1,7 +1,7 @@
 import StrictEventEmitter from 'strict-event-emitter-types';
 import { Socket } from 'dgram';
 import { EventEmitter } from 'events';
-import { CDJStatus, MediaSlotInfo } from 'src/types';
+import { CDJStatus, MediaSlotInfo } from "../types";
 import { makeMediaSlotRequest } from './media';
 interface StatusEvents {
     /**
@@ -20,12 +20,12 @@ interface StatusEvents {
 type Emitter = StrictEventEmitter<EventEmitter, StatusEvents>;
 type MediaSlotOptions = Parameters<typeof makeMediaSlotRequest>[0];
 /**
- * The status emitter will report every time a device status is recieved
+ * The status emitter will report every time a device status is received
  */
 declare class StatusEmitter {
     #private;
     /**
-     * @param statusSocket A UDP socket to recieve CDJ status packets on
+     * @param statusSocket A UDP socket to receive CDJ status packets on
      */
     constructor(statusSocket: Socket);
     on: Emitter['on'];

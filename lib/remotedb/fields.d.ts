@@ -9,32 +9,27 @@ export declare enum FieldType {
     Binary = 20,
     String = 38
 }
-/**
- * The generic interface for all field types
- */
-export interface BaseField {
+export declare abstract class BaseField {
+    ['constructor']: typeof BaseField;
     /**
      * The raw field data
      */
     data: Buffer;
     /**
-     * Corce the field into a buffer. This differes from reading the data
+     * Corce the field into a buffer. This differs from reading the data
      * property in that it will include the field type header.
      */
-    readonly buffer: Buffer;
-}
-export declare class BaseField {
+    abstract buffer: Buffer;
     /**
      * Declares the type of field this class represents
      */
     static type: FieldType;
     /**
      * The number of bytes to read for this field. If the field is not a fixed size,
-     * set this to a function which will recieve the UInt32 value just after
+     * set this to a function which will receive the UInt32 value just after
      * reading the field type, returning the next number of bytes to read.
      */
     static bytesToRead: number | ((reportedLength: number) => number);
-    ['constructor']: typeof BaseField;
 }
 export type NumberField<T extends number = number> = BaseField & {
     /**
@@ -62,12 +57,12 @@ type NumberFieldType = FieldType.UInt32 | FieldType.UInt16 | FieldType.UInt8;
 export declare const UInt8: {
     new (value: number | Buffer): {
         value: number;
-        get buffer(): Buffer<ArrayBuffer>;
+        readonly buffer: Buffer<ArrayBuffer>;
+        constructor: typeof BaseField;
         /**
          * The raw field data
          */
         data: Buffer;
-        constructor: typeof BaseField;
     };
     type: NumberFieldType;
     bytesToRead: 1 | 2 | 4;
@@ -78,12 +73,12 @@ export declare const UInt8: {
 export declare const UInt16: {
     new (value: number | Buffer): {
         value: number;
-        get buffer(): Buffer<ArrayBuffer>;
+        readonly buffer: Buffer<ArrayBuffer>;
+        constructor: typeof BaseField;
         /**
          * The raw field data
          */
         data: Buffer;
-        constructor: typeof BaseField;
     };
     type: NumberFieldType;
     bytesToRead: 1 | 2 | 4;
@@ -94,12 +89,12 @@ export declare const UInt16: {
 export declare const UInt32: {
     new (value: number | Buffer): {
         value: number;
-        get buffer(): Buffer<ArrayBuffer>;
+        readonly buffer: Buffer<ArrayBuffer>;
+        constructor: typeof BaseField;
         /**
          * The raw field data
          */
         data: Buffer;
-        constructor: typeof BaseField;
     };
     type: NumberFieldType;
     bytesToRead: 1 | 2 | 4;
@@ -128,12 +123,12 @@ declare const fieldMap: {
     readonly 15: {
         new (value: number | Buffer): {
             value: number;
-            get buffer(): Buffer<ArrayBuffer>;
+            readonly buffer: Buffer<ArrayBuffer>;
+            constructor: typeof BaseField;
             /**
              * The raw field data
              */
             data: Buffer;
-            constructor: typeof BaseField;
         };
         type: NumberFieldType;
         bytesToRead: 1 | 2 | 4;
@@ -141,12 +136,12 @@ declare const fieldMap: {
     readonly 16: {
         new (value: number | Buffer): {
             value: number;
-            get buffer(): Buffer<ArrayBuffer>;
+            readonly buffer: Buffer<ArrayBuffer>;
+            constructor: typeof BaseField;
             /**
              * The raw field data
              */
             data: Buffer;
-            constructor: typeof BaseField;
         };
         type: NumberFieldType;
         bytesToRead: 1 | 2 | 4;
@@ -154,12 +149,12 @@ declare const fieldMap: {
     readonly 17: {
         new (value: number | Buffer): {
             value: number;
-            get buffer(): Buffer<ArrayBuffer>;
+            readonly buffer: Buffer<ArrayBuffer>;
+            constructor: typeof BaseField;
             /**
              * The raw field data
              */
             data: Buffer;
-            constructor: typeof BaseField;
         };
         type: NumberFieldType;
         bytesToRead: 1 | 2 | 4;

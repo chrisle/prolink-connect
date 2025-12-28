@@ -1,14 +1,14 @@
 import { Socket } from 'dgram';
 import { NetworkInterfaceInfoIPv4 } from 'os';
-import Control from 'src/control';
-import Database from 'src/db';
-import DeviceManager from 'src/devices';
-import LocalDatabase from 'src/localdb';
-import { MixstatusProcessor } from 'src/mixstatus';
-import RemoteDatabase from 'src/remotedb';
-import StatusEmitter from 'src/status';
-import PositionEmitter from 'src/status/position';
-import { NetworkState } from 'src/types';
+import Control from "./control";
+import Database from "./db";
+import DeviceManager from "./devices";
+import LocalDatabase from "./localdb";
+import { MixstatusProcessor } from "./mixstatus";
+import RemoteDatabase from "./remotedb";
+import StatusEmitter from "./status";
+import PositionEmitter from "./status/position";
+import { NetworkState } from "./types";
 export interface NetworkConfig {
     /**
      * The network interface to listen for devices on the network over
@@ -28,8 +28,8 @@ export interface NetworkConfig {
      * use a ID within the 1-6 range, as the CDJs will not respond to metadata
      * requests outside of the range of 1-6
      *
-     * Note that rekordbox analized media connected to the CDJ is accessed out of
-     * band of the networks remote database protocl, and is not limited by this
+     * Note that rekordbox analyzed media connected to the CDJ is accessed out of
+     * band of the networks remote database protocol, and is not limited by this
      * restriction.
      */
     vcdjId: number;
@@ -86,7 +86,7 @@ export declare class ProlinkNetwork {
      * Wait for another device to show up on the network to determine which network
      * interface to listen on.
      *
-     * Defaults the Virtual CDJ ID to 5.
+     * Defaults the Virtual CDJ ID to 7.
      */
     autoconfigFromPeers(): Promise<void>;
     /**
@@ -174,7 +174,7 @@ export declare class ProlinkNetwork {
      */
     get remotedb(): RemoteDatabase | null;
     /**
-     * Get (and initalize) the {@link MixstatusProcessor} service. This service can
+     * Get (and initialize) the {@link MixstatusProcessor} service. This service can
      * be used to monitor the 'status' of devices on the network as a whole.
      */
     get mixstatus(): MixstatusProcessor | null;

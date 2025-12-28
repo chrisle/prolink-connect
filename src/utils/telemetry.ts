@@ -27,6 +27,7 @@ const noopSpan = {
   startChild(_context?: unknown) {
     return noopSpan;
   },
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   finish() {},
   setData(_key: string, _value: unknown) {
     return noopSpan;

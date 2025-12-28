@@ -1,4 +1,4 @@
-import { BeatGrid, CueAndLoop, WaveformHD } from 'src/types';
+import { BeatGrid, CueAndLoop, WaveformHD } from "./types";
 /**
  * Documentation type strictly for use with entities that have foreign key
  * attributes.

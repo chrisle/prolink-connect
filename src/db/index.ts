@@ -1,6 +1,3 @@
-import * as Telemetry from 'src/utils/telemetry';
-import {SpanStatus} from 'src/utils/telemetry';
-
 import DeviceManager from 'src/devices';
 import {Track} from 'src/entities';
 import LocalDatabase from 'src/localdb';
@@ -14,9 +11,11 @@ import {
   Waveforms,
 } from 'src/types';
 import {getSlotName, getTrackTypeName} from 'src/utils';
+import * as Telemetry from 'src/utils/telemetry';
+import {SpanStatus} from 'src/utils/telemetry';
 
-import * as GetFile from './getFile';
 import * as GetArtworkThumbnail from './getArtworkThumbnail';
+import * as GetFile from './getFile';
 import * as GetMetadata from './getMetadata';
 import * as GetPlaylist from './getPlaylist';
 import * as GetWaveforms from './getWaveforms';

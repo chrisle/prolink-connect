@@ -1,4 +1,3 @@
-import * as Telemetry from 'src/utils/telemetry';
 import {Span} from '@sentry/tracing';
 import {Mutex} from 'async-mutex';
 import * as ip from 'ip-address';
@@ -8,6 +7,7 @@ import {Socket} from 'net';
 
 import DeviceManager from 'src/devices';
 import {Device, DeviceID, MediaSlot, TrackType} from 'src/types';
+import * as Telemetry from 'src/utils/telemetry';
 
 import {getMessageName, MessageType, Request, Response} from './message/types';
 import {REMOTEDB_SERVER_QUERY_PORT} from './constants';

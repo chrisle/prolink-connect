@@ -31,7 +31,7 @@ export declare class RpcConnection {
     mutex: Mutex;
     xid: number;
     constructor(address: string, retryConfig?: RetryConfig);
-    get connected(): boolean;
+    connected: boolean;
     setupRequest({ program, version, procedure, data }: Omit<RpcCall, 'port'>): any;
     /**
      * Execute a RPC transaction (call and response).

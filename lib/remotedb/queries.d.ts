@@ -1,5 +1,5 @@
 import { Span } from '@sentry/tracing';
-import * as entities from 'src/entities';
+import * as entities from "../entities";
 import { Item, ItemType } from './message/item';
 import { Connection, LookupDescriptor, Query } from '.';
 /**

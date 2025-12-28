@@ -1,6 +1,6 @@
 import * as ip from 'ip-address';
 import { NetworkInterfaceInfoIPv4 } from 'os';
-import { Device, MediaSlot, TrackType } from 'src/types';
+import { Device, MediaSlot, TrackType } from "../types";
 /**
  * Get the byte representation of the device name
  */

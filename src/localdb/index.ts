@@ -1,4 +1,3 @@
-import * as Telemetry from 'src/utils/telemetry';
 import {Mutex} from 'async-mutex';
 import StrictEventEmitter from 'strict-event-emitter-types';
 
@@ -17,6 +16,7 @@ import {
   TrackType,
 } from 'src/types';
 import {getSlotName} from 'src/utils';
+import * as Telemetry from 'src/utils/telemetry';
 
 import {MetadataORM} from './orm';
 import {hydrateDatabase, HydrationProgress} from './rekordbox';

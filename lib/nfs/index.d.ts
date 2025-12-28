@@ -1,5 +1,5 @@
 import { Span } from '@sentry/tracing';
-import { Device } from 'src/types';
+import { Device } from "../types";
 import { fetchFile as fetchFileCall } from './programs';
 import { RetryConfig } from './rpc';
 export interface FetchProgress {

@@ -1,8 +1,8 @@
 import { Span } from '@sentry/tracing';
 import { PromiseReadable } from 'promise-readable';
-import { Field } from 'src/remotedb/fields';
-import { responseTransform } from 'src/remotedb/message/response';
-import { MessageType, Response } from 'src/remotedb/message/types';
+import { Field } from "../fields";
+import { responseTransform } from "./response";
+import { MessageType, Response } from "./types";
 interface Options<T extends MessageType> {
     transactionId?: number;
     type: T;

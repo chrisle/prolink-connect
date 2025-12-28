@@ -9,7 +9,7 @@ import {CDJStatus, MediaSlotInfo} from 'src/types';
 import {udpSend} from 'src/utils/udp';
 
 import {makeMediaSlotRequest} from './media';
-import {mediaSlotFromPacket, statusFromPacket, onAirFromPacket} from './utils';
+import {mediaSlotFromPacket, onAirFromPacket, statusFromPacket} from './utils';
 
 interface StatusEvents {
   /**

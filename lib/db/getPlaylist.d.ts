@@ -1,8 +1,8 @@
 import { Span } from '@sentry/tracing';
-import { Playlist } from 'src/entities';
-import LocalDatabase from 'src/localdb';
-import RemoteDatabase from 'src/remotedb';
-import { DeviceID, MediaSlot, PlaylistContents } from 'src/types';
+import { Playlist } from "../entities";
+import LocalDatabase from "../localdb";
+import RemoteDatabase from "../remotedb";
+import { DeviceID, MediaSlot, PlaylistContents } from "../types";
 export interface Options {
     /**
      * The playlist or folder to query the entries of. This may be left as

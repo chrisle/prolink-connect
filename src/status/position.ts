@@ -24,7 +24,6 @@ type Emitter = StrictEventEmitter<EventEmitter, PositionEvents>;
  * reverse play, loops, and needle jumps.
  */
 class PositionEmitter {
-  #beatSocket: Socket;
   /**
    * The EventEmitter which reports position updates
    */
@@ -34,7 +33,6 @@ class PositionEmitter {
    * @param beatSocket A UDP socket to receive position packets on port 50001
    */
   constructor(beatSocket: Socket) {
-    this.#beatSocket = beatSocket;
     beatSocket.on('message', this.#handlePosition);
   }
 

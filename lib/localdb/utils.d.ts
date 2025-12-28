@@ -1,4 +1,4 @@
-import { CueAndLoop, HotcueButton } from 'src/types';
+import { CueAndLoop, HotcueButton } from "../types";
 /**
  * Create a CueAndLoop entry given common parameters
  */

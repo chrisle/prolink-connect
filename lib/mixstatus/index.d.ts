@@ -1,6 +1,6 @@
 import StrictEventEmitter from 'strict-event-emitter-types';
 import { EventEmitter } from 'events';
-import { CDJStatus, DeviceID, MixstatusMode } from 'src/types';
+import { CDJStatus, DeviceID, MixstatusMode } from "../types";
 export interface MixstatusConfig {
     /**
      * Selects the mixstatus reporting mode
@@ -47,11 +47,11 @@ export interface MixstatusConfig {
 interface MixstatusEvents {
     /**
      * Fired when a track is considered to be on-air and is being heard by the
-     * audiance
+     * audience
      */
     nowPlaying: (state: CDJStatus.State) => void;
     /**
-     * Fired when a track has stopped and is completley offair
+     * Fired when a track has stopped and is completely offair
      */
     stopped: (opt: {
         deviceId: DeviceID;
@@ -89,7 +89,7 @@ export declare class MixstatusProcessor {
     #private;
     constructor(config?: Partial<MixstatusConfig>);
     /**
-     * Update the configration
+     * Update the configuration
      */
     configure(config?: Partial<MixstatusConfig>): void;
     on: Emitter['on'];
