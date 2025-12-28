@@ -6,11 +6,19 @@
 import * as Sentry from '@sentry/node';
 
 /**
+ * Get the Sentry DSN from environment variable.
+ */
+export const getSentryDsn = (): string | undefined =>
+  process.env.PROLINK_CONNECT_SENTRY_DSN || process.env.SENTRY_DSN;
+
+/**
  * Check if telemetry is enabled via environment variable.
+ * Telemetry is enabled if PROLINK_CONNECT_TELEMETRY is set to 'true' or '1',
+ * or if a Sentry DSN is provided.
  */
 export const isTelemetryEnabled = (): boolean => {
   const value = process.env.PROLINK_CONNECT_TELEMETRY;
-  return value === 'true' || value === '1';
+  return value === 'true' || value === '1' || !!getSentryDsn();
 };
 
 /**
@@ -122,11 +130,23 @@ function wrapSpan(span: Sentry.Span | undefined): TelemetrySpan {
 
 /**
  * Initialize Sentry if telemetry is enabled.
+ * DSN can be provided via options or via environment variable
+ * (PROLINK_CONNECT_SENTRY_DSN or SENTRY_DSN).
  */
-export function init(options: Sentry.NodeOptions): void {
-  if (isTelemetryEnabled()) {
-    Sentry.init(options);
+export function init(options?: Sentry.NodeOptions): void {
+  if (!isTelemetryEnabled()) {
+    return;
   }
+
+  const dsn = options?.dsn ?? getSentryDsn();
+  if (!dsn) {
+    return;
+  }
+
+  Sentry.init({
+    ...options,
+    dsn,
+  });
 }
 
 /**

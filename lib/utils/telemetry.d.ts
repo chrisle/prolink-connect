@@ -5,7 +5,13 @@
  */
 import * as Sentry from '@sentry/node';
 /**
+ * Get the Sentry DSN from environment variable.
+ */
+export declare const getSentryDsn: () => string | undefined;
+/**
  * Check if telemetry is enabled via environment variable.
+ * Telemetry is enabled if PROLINK_CONNECT_TELEMETRY is set to 'true' or '1',
+ * or if a Sentry DSN is provided.
  */
 export declare const isTelemetryEnabled: () => boolean;
 /**
@@ -54,8 +60,10 @@ export interface TelemetrySpan {
 }
 /**
  * Initialize Sentry if telemetry is enabled.
+ * DSN can be provided via options or via environment variable
+ * (PROLINK_CONNECT_SENTRY_DSN or SENTRY_DSN).
  */
-export declare function init(options: Sentry.NodeOptions): void;
+export declare function init(options?: Sentry.NodeOptions): void;
 /**
  * Start a transaction/span if telemetry is enabled, otherwise return a no-op.
  */
