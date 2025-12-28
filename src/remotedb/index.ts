@@ -1,4 +1,3 @@
-import {Span} from '@sentry/tracing';
 import {Mutex} from 'async-mutex';
 import * as ip from 'ip-address';
 import PromiseSocket from 'promise-socket';
@@ -7,6 +6,7 @@ import {Socket} from 'net';
 
 import DeviceManager from 'src/devices';
 import {Device, DeviceID, MediaSlot, TrackType} from 'src/types';
+import {TelemetrySpan as Span} from 'src/utils/telemetry';
 import * as Telemetry from 'src/utils/telemetry';
 
 import {getMessageName, MessageType, Request, Response} from './message/types';

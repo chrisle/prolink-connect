@@ -1,4 +1,4 @@
-import { Span } from '@sentry/tracing';
+import { TelemetrySpan as Span } from "../utils/telemetry";
 import LocalDatabase from "../localdb";
 import RemoteDatabase from "../remotedb";
 import { Device, DeviceID, MediaSlot, TrackType } from "../types";

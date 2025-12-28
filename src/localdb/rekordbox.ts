@@ -1,4 +1,3 @@
-import {Span} from '@sentry/tracing';
 import {KaitaiStream} from 'kaitai-struct';
 
 import {
@@ -29,6 +28,7 @@ import {
   WaveformPreviewData,
 } from 'src/types';
 import {convertWaveformHDData} from 'src/utils/converters';
+import {TelemetrySpan as Span} from 'src/utils/telemetry';
 import * as Telemetry from 'src/utils/telemetry';
 
 // NOTE: Kaitai doesn't currently have a good typescript exporter, so we will

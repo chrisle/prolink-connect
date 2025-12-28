@@ -1,10 +1,10 @@
-import { Span } from '@sentry/tracing';
+import { TelemetrySpan as Span } from "../utils/telemetry";
 import { Items, ItemType } from './message/item';
 import { Message } from './message';
 import { Connection, LookupDescriptor } from '.';
 export declare const fieldFromDescriptor: ({ hostDevice, menuTarget, trackSlot, trackType, }: LookupDescriptor) => {
     value: number;
-    readonly buffer: Buffer<ArrayBuffer>;
+    get buffer(): Buffer<ArrayBuffer>;
     constructor: typeof import("./fields").BaseField;
     data: Buffer;
 };

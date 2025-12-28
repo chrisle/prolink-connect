@@ -10,6 +10,13 @@ interface Config {
      * @default 10000 ms
      */
     deviceTimeout?: number;
+    /**
+     * The name of the virtual CDJ to filter out from device announcements.
+     * This prevents our own device from appearing in the device list.
+     *
+     * @default VIRTUAL_CDJ_NAME constant
+     */
+    vcdjName?: string;
 }
 /**
  * The configuration object that may be passed to reconfigure the manager

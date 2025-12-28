@@ -1,4 +1,4 @@
-import { Span } from '@sentry/tracing';
+import { TelemetrySpan as Span } from "../utils/telemetry";
 import { RpcConnection, RpcProgram } from './rpc';
 import { FetchProgress } from '.';
 interface Program {

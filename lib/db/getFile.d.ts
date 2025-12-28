@@ -1,9 +1,9 @@
-import { Span } from '@sentry/tracing';
+import { TelemetrySpan as Span } from "../utils/telemetry";
 import { Track } from "../entities";
 import LocalDatabase from "../localdb";
 import RemoteDatabase from "../remotedb";
 import { Device, DeviceID, MediaSlot, TrackType } from "../types";
-export type Options = {
+export interface Options {
     /**
      * The device to query the file off of
      */
@@ -24,6 +24,6 @@ export type Options = {
      * The Sentry transaction span
      */
     span?: Span;
-};
-export declare function viaRemote(remote: RemoteDatabase, device: Device, opts: Required<Options>): Promise<null>;
+}
+export declare function viaRemote(_remote: RemoteDatabase, _device: Device, _opts: Required<Options>): null;
 export declare function viaLocal(local: LocalDatabase, device: Device, opts: Required<Options>): Promise<Buffer<ArrayBuffer> | null>;

@@ -4,23 +4,62 @@
  * PROLINK_CONNECT_TELEMETRY=true in the environment.
  */
 import * as Sentry from '@sentry/node';
-import { Span, SpanStatus } from '@sentry/tracing';
 /**
  * Check if telemetry is enabled via environment variable.
  */
 export declare const isTelemetryEnabled: () => boolean;
 /**
- * Re-export SpanStatus for convenience.
+ * Span status values for telemetry.
  */
-export { SpanStatus };
+export declare const SpanStatus: {
+    readonly Ok: "ok";
+    readonly Cancelled: "cancelled";
+    readonly Unknown: "unknown";
+    readonly InvalidArgument: "invalid_argument";
+    readonly DeadlineExceeded: "deadline_exceeded";
+    readonly NotFound: "not_found";
+    readonly AlreadyExists: "already_exists";
+    readonly PermissionDenied: "permission_denied";
+    readonly ResourceExhausted: "resource_exhausted";
+    readonly FailedPrecondition: "failed_precondition";
+    readonly Aborted: "aborted";
+    readonly OutOfRange: "out_of_range";
+    readonly Unimplemented: "unimplemented";
+    readonly InternalError: "internal_error";
+    readonly Unavailable: "unavailable";
+    readonly DataLoss: "data_loss";
+    readonly Unauthenticated: "unauthenticated";
+};
+export type SpanStatusType = (typeof SpanStatus)[keyof typeof SpanStatus];
+/**
+ * Context for starting a child span.
+ */
+export interface SpanContext {
+    name?: string;
+    op?: string;
+    description?: string;
+    data?: Record<string, unknown>;
+}
+/**
+ * Interface for span-like objects returned by telemetry functions.
+ */
+export interface TelemetrySpan {
+    startChild(context?: SpanContext): TelemetrySpan;
+    setData(key: string, value: unknown): TelemetrySpan;
+    setTag(key: string, value: string): TelemetrySpan;
+    setStatus(status: SpanStatusType): TelemetrySpan;
+    end(): void;
+    /** @deprecated Use end() instead */
+    finish(): void;
+}
 /**
  * Initialize Sentry if telemetry is enabled.
  */
 export declare function init(options: Sentry.NodeOptions): void;
 /**
- * Start a transaction if telemetry is enabled, otherwise return a no-op.
+ * Start a transaction/span if telemetry is enabled, otherwise return a no-op.
  */
-export declare function startTransaction(context: Parameters<typeof Sentry.startTransaction>[0]): Span;
+export declare function startTransaction(context: SpanContext): TelemetrySpan;
 /**
  * Capture an exception if telemetry is enabled.
  */
@@ -28,12 +67,19 @@ export declare function captureException(exception: unknown, hint?: Parameters<t
 /**
  * Capture a message if telemetry is enabled.
  */
-export declare function captureMessage(message: string, level?: Sentry.Severity | Parameters<typeof Sentry.captureMessage>[1]): string;
+export declare function captureMessage(message: string, level?: Sentry.SeverityLevel | Parameters<typeof Sentry.captureMessage>[1]): string;
 /**
  * Set a tag if telemetry is enabled.
  */
 export declare function setTag(key: string, value: string): void;
 /**
- * Re-export Severity enum for convenience.
+ * Severity levels for messages.
  */
-export declare const Severity: typeof Sentry.Severity;
+export declare const Severity: {
+    readonly Fatal: "fatal";
+    readonly Error: "error";
+    readonly Warning: "warning";
+    readonly Log: "log";
+    readonly Info: "info";
+    readonly Debug: "debug";
+};

@@ -1,7 +1,6 @@
-import {Span} from '@sentry/tracing';
-
 import {Device, DeviceID, MediaSlot} from 'src/types';
 import {getSlotName} from 'src/utils';
+import {TelemetrySpan as Span} from 'src/utils/telemetry';
 import * as Telemetry from 'src/utils/telemetry';
 
 import {

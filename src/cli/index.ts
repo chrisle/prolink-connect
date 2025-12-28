@@ -1,5 +1,3 @@
-import '@sentry/tracing';
-
 import signale from 'signale';
 
 import fs from 'fs';

@@ -1,4 +1,4 @@
-import {Span} from '@sentry/tracing';
+import {TelemetrySpan as Span} from 'src/utils/telemetry';
 
 import {RpcConnection, RpcProgram} from './rpc';
 import {flattenLinkedList} from './utils';

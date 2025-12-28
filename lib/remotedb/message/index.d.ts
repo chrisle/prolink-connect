@@ -1,4 +1,4 @@
-import { Span } from '@sentry/tracing';
+import { TelemetrySpan as Span } from "../../utils/telemetry";
 import { PromiseReadable } from 'promise-readable';
 import { Field } from "../fields";
 import { responseTransform } from "./response";

@@ -1,10 +1,9 @@
-import {Span} from '@sentry/tracing';
-
 import {Track} from 'src/entities';
 import LocalDatabase from 'src/localdb';
 import {fetchFile} from 'src/nfs';
 import RemoteDatabase, {MenuTarget, Query} from 'src/remotedb';
 import {Device, DeviceID, MediaSlot, TrackType} from 'src/types';
+import {TelemetrySpan as Span} from 'src/utils/telemetry';
 import * as Telemetry from 'src/utils/telemetry';
 
 export interface Options {

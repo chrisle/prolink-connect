@@ -57,7 +57,7 @@ type NumberFieldType = FieldType.UInt32 | FieldType.UInt16 | FieldType.UInt8;
 export declare const UInt8: {
     new (value: number | Buffer): {
         value: number;
-        readonly buffer: Buffer<ArrayBuffer>;
+        get buffer(): Buffer<ArrayBuffer>;
         constructor: typeof BaseField;
         /**
          * The raw field data
@@ -65,7 +65,7 @@ export declare const UInt8: {
         data: Buffer;
     };
     type: NumberFieldType;
-    bytesToRead: 1 | 2 | 4;
+    bytesToRead: 1 | 4 | 2;
 };
 /**
  * Field representing a UInt16
@@ -73,7 +73,7 @@ export declare const UInt8: {
 export declare const UInt16: {
     new (value: number | Buffer): {
         value: number;
-        readonly buffer: Buffer<ArrayBuffer>;
+        get buffer(): Buffer<ArrayBuffer>;
         constructor: typeof BaseField;
         /**
          * The raw field data
@@ -81,7 +81,7 @@ export declare const UInt16: {
         data: Buffer;
     };
     type: NumberFieldType;
-    bytesToRead: 1 | 2 | 4;
+    bytesToRead: 1 | 4 | 2;
 };
 /**
  * Field representing a UInt32
@@ -89,7 +89,7 @@ export declare const UInt16: {
 export declare const UInt32: {
     new (value: number | Buffer): {
         value: number;
-        readonly buffer: Buffer<ArrayBuffer>;
+        get buffer(): Buffer<ArrayBuffer>;
         constructor: typeof BaseField;
         /**
          * The raw field data
@@ -97,7 +97,7 @@ export declare const UInt32: {
         data: Buffer;
     };
     type: NumberFieldType;
-    bytesToRead: 1 | 2 | 4;
+    bytesToRead: 1 | 4 | 2;
 };
 /**
  * Field representing a null-terminated big endian UTF-16 string
@@ -123,7 +123,7 @@ declare const fieldMap: {
     readonly 15: {
         new (value: number | Buffer): {
             value: number;
-            readonly buffer: Buffer<ArrayBuffer>;
+            get buffer(): Buffer<ArrayBuffer>;
             constructor: typeof BaseField;
             /**
              * The raw field data
@@ -131,12 +131,12 @@ declare const fieldMap: {
             data: Buffer;
         };
         type: NumberFieldType;
-        bytesToRead: 1 | 2 | 4;
+        bytesToRead: 1 | 4 | 2;
     };
     readonly 16: {
         new (value: number | Buffer): {
             value: number;
-            readonly buffer: Buffer<ArrayBuffer>;
+            get buffer(): Buffer<ArrayBuffer>;
             constructor: typeof BaseField;
             /**
              * The raw field data
@@ -144,12 +144,12 @@ declare const fieldMap: {
             data: Buffer;
         };
         type: NumberFieldType;
-        bytesToRead: 1 | 2 | 4;
+        bytesToRead: 1 | 4 | 2;
     };
     readonly 17: {
         new (value: number | Buffer): {
             value: number;
-            readonly buffer: Buffer<ArrayBuffer>;
+            get buffer(): Buffer<ArrayBuffer>;
             constructor: typeof BaseField;
             /**
              * The raw field data
@@ -157,7 +157,7 @@ declare const fieldMap: {
             data: Buffer;
         };
         type: NumberFieldType;
-        bytesToRead: 1 | 2 | 4;
+        bytesToRead: 1 | 4 | 2;
     };
     readonly 20: typeof Binary;
     readonly 38: typeof String;

@@ -34,6 +34,14 @@ export interface NetworkConfig {
      */
     vcdjId: number;
     /**
+     * The name to announce the virtual CDJ as on the network.
+     *
+     * This name will appear in device lists on other Pro DJ Link equipment.
+     *
+     * @default 'ProLink-Connect'
+     */
+    vcdjName?: string;
+    /**
      * Enable full startup protocol for robust device negotiation.
      * When enabled, the virtual CDJ will go through the complete startup
      * sequence (stages 0x0a → 0x00 → 0x02 → 0x04 → 0x06) before regular

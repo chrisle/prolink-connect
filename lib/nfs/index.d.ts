@@ -1,4 +1,4 @@
-import { Span } from '@sentry/tracing';
+import { TelemetrySpan as Span } from "../utils/telemetry";
 import { Device } from "../types";
 import { fetchFile as fetchFileCall } from './programs';
 import { RetryConfig } from './rpc';
@@ -30,7 +30,7 @@ interface FetchFileOptions {
  *       important that when the device disconnects you call the {@link
  *       resetDeviceCache} function.
  */
-export declare function fetchFile({ device, slot, path, onProgress, span, chunkSize }: FetchFileOptions): Promise<Buffer<ArrayBuffer>>;
+export declare function fetchFile({ device, slot, path, onProgress, span, chunkSize, }: FetchFileOptions): Promise<Buffer<ArrayBuffer>>;
 /**
  * Clear the cached NFS connection and root filehandle for the given device
  */

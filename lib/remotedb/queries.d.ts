@@ -1,4 +1,4 @@
-import { Span } from '@sentry/tracing';
+import { TelemetrySpan as Span } from "../utils/telemetry";
 import * as entities from "../entities";
 import { Item, ItemType } from './message/item';
 import { Connection, LookupDescriptor, Query } from '.';

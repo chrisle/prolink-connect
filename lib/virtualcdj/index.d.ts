@@ -4,8 +4,12 @@ import DeviceManager from "../devices";
 import { Device, DeviceID } from "../types";
 /**
  * Constructs a virtual CDJ Device.
+ *
+ * @param iface - The network interface to use
+ * @param id - The device ID to use
+ * @param name - Optional custom name (defaults to VIRTUAL_CDJ_NAME constant)
  */
-export declare const getVirtualCDJ: (iface: NetworkInterfaceInfoIPv4, id: DeviceID) => Device;
+export declare const getVirtualCDJ: (iface: NetworkInterfaceInfoIPv4, id: DeviceID, name?: string) => Device;
 /**
  * Returns a mostly empty-state status packet. This is currently used to report
  * the virtual CDJs status, which *seems* to be required for the CDJ to send
