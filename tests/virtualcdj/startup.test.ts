@@ -2,7 +2,12 @@ import {Socket} from 'dgram';
 
 import DeviceManager from 'src/devices';
 import {DeviceType} from 'src/types';
-import {Announcer, getVirtualCDJ} from 'src/virtualcdj';
+import {
+  Announcer,
+  getVirtualCDJ,
+  makeAnnouncePacket,
+  makeStatusPacket,
+} from 'src/virtualcdj';
 
 describe('Full Startup Protocol', () => {
   const mockIface = {
@@ -295,6 +300,71 @@ describe('Full Startup Protocol', () => {
       );
 
       expect(announcer).toBeDefined();
+    });
+  });
+
+  describe('Packet building functions', () => {
+    it('should build status packet with correct structure', () => {
+      const device = getVirtualCDJ(mockIface, 1);
+      const packet = makeStatusPacket(device);
+
+      expect(packet).toBeInstanceOf(Uint8Array);
+      expect(packet.length).toBe(284);
+      // Check device ID is set at correct positions
+      expect(packet[0x21]).toBe(1);
+      expect(packet[0x24]).toBe(1);
+    });
+
+    it('should build status packet for high player numbers', () => {
+      const device = getVirtualCDJ(mockIface, 5);
+      const packet = makeStatusPacket(device);
+
+      expect(packet[0x21]).toBe(5);
+      expect(packet[0x24]).toBe(5);
+    });
+
+    it('should build announce packet with correct structure', () => {
+      const device = getVirtualCDJ(mockIface, 1);
+      const packet = makeAnnouncePacket(device);
+
+      expect(packet).toBeInstanceOf(Uint8Array);
+      expect(packet.length).toBe(54);
+      // Check player ID position
+      expect(packet[0x24]).toBe(1);
+      // Check player type
+      expect(packet[0x25]).toBe(DeviceType.CDJ);
+    });
+
+    it('should build announce packet for CDJ-3000 player numbers', () => {
+      const device = getVirtualCDJ(mockIface, 5);
+      const packet = makeAnnouncePacket(device);
+
+      expect(packet[0x24]).toBe(5);
+      expect(packet[0x25]).toBe(DeviceType.CDJ);
+    });
+
+    it('should include MAC address in announce packet', () => {
+      const device = getVirtualCDJ(mockIface, 1);
+      const packet = makeAnnouncePacket(device);
+
+      // MAC address starts at 0x26 (6 bytes)
+      expect(packet[0x26]).toBe(0x00);
+      expect(packet[0x27]).toBe(0x11);
+      expect(packet[0x28]).toBe(0x22);
+      expect(packet[0x29]).toBe(0x33);
+      expect(packet[0x2a]).toBe(0x44);
+      expect(packet[0x2b]).toBe(0x55);
+    });
+
+    it('should include IP address in announce packet', () => {
+      const device = getVirtualCDJ(mockIface, 1);
+      const packet = makeAnnouncePacket(device);
+
+      // IP address starts at 0x2C (4 bytes)
+      expect(packet[0x2c]).toBe(192);
+      expect(packet[0x2d]).toBe(168);
+      expect(packet[0x2e]).toBe(1);
+      expect(packet[0x2f]).toBe(100);
     });
   });
 
