@@ -1,5 +1,21 @@
 import * as XDR from 'js-xdr';
-import {calculatePadding, slicePadding} from 'js-xdr/lib/util';
+
+/**
+ * Calculate padding needed to align to 4-byte boundary (XDR requirement)
+ */
+function calculatePadding(length: number): number {
+  const remainder = length % 4;
+  return remainder === 0 ? 0 : 4 - remainder;
+}
+
+/**
+ * Skip padding bytes in the IO stream
+ */
+function slicePadding(io: any, padding: number): void {
+  if (padding > 0) {
+    io.slice(padding);
+  }
+}
 
 /**
  * A xdr type to read the rest of the data in the buffer
