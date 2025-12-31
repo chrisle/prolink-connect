@@ -1,17 +1,8 @@
 /**
- * Telemetry utility that wraps Sentry and provides opt-in telemetry.
- * Telemetry is disabled by default and can be enabled by setting
- * PROLINK_CONNECT_TELEMETRY=true in the environment.
+ * Telemetry utility - Sentry removed, now a no-op implementation.
  */
-import * as Sentry from '@sentry/node';
 /**
- * Get the Sentry DSN from environment variable.
- */
-export declare const getSentryDsn: () => string | undefined;
-/**
- * Check if telemetry is enabled via environment variable.
- * Telemetry is enabled if PROLINK_CONNECT_TELEMETRY is set to 'true' or '1',
- * or if a Sentry DSN is provided.
+ * Check if telemetry is enabled - always false now.
  */
 export declare const isTelemetryEnabled: () => boolean;
 /**
@@ -59,27 +50,25 @@ export interface TelemetrySpan {
     finish(): void;
 }
 /**
- * Initialize Sentry if telemetry is enabled.
- * DSN can be provided via options or via environment variable
- * (PROLINK_CONNECT_SENTRY_DSN or SENTRY_DSN).
+ * Initialize telemetry - no-op.
  */
-export declare function init(options?: Sentry.NodeOptions): void;
+export declare function init(_options?: unknown): void;
 /**
- * Start a transaction/span if telemetry is enabled, otherwise return a no-op.
+ * Start a transaction/span - returns no-op.
  */
-export declare function startTransaction(context: SpanContext): TelemetrySpan;
+export declare function startTransaction(_context: SpanContext): TelemetrySpan;
 /**
- * Capture an exception if telemetry is enabled.
+ * Capture an exception - no-op.
  */
-export declare function captureException(exception: unknown, hint?: Parameters<typeof Sentry.captureException>[1]): string;
+export declare function captureException(_exception: unknown, _hint?: unknown): string;
 /**
- * Capture a message if telemetry is enabled.
+ * Capture a message - no-op.
  */
-export declare function captureMessage(message: string, level?: Sentry.SeverityLevel | Parameters<typeof Sentry.captureMessage>[1]): string;
+export declare function captureMessage(_message: string, _level?: unknown): string;
 /**
- * Set a tag if telemetry is enabled.
+ * Set a tag - no-op.
  */
-export declare function setTag(key: string, value: string): void;
+export declare function setTag(_key: string, _value: string): void;
 /**
  * Severity levels for messages.
  */

@@ -1,25 +1,11 @@
 /**
- * Telemetry utility that wraps Sentry and provides opt-in telemetry.
- * Telemetry is disabled by default and can be enabled by setting
- * PROLINK_CONNECT_TELEMETRY=true in the environment.
+ * Telemetry utility - Sentry removed, now a no-op implementation.
  */
-import * as Sentry from '@sentry/node';
 
 /**
- * Get the Sentry DSN from environment variable.
+ * Check if telemetry is enabled - always false now.
  */
-export const getSentryDsn = (): string | undefined =>
-  process.env.PROLINK_CONNECT_SENTRY_DSN || process.env.SENTRY_DSN;
-
-/**
- * Check if telemetry is enabled via environment variable.
- * Telemetry is enabled if PROLINK_CONNECT_TELEMETRY is set to 'true' or '1',
- * or if a Sentry DSN is provided.
- */
-export const isTelemetryEnabled = (): boolean => {
-  const value = process.env.PROLINK_CONNECT_TELEMETRY;
-  return value === 'true' || value === '1' || !!getSentryDsn();
-};
+export const isTelemetryEnabled = (): boolean => false;
 
 /**
  * Span status values for telemetry.
@@ -70,7 +56,7 @@ export interface TelemetrySpan {
 }
 
 /**
- * No-op span implementation for when telemetry is disabled.
+ * No-op span implementation.
  */
 const noopSpan: TelemetrySpan = {
   startChild(_context?: SpanContext) {
@@ -85,120 +71,46 @@ const noopSpan: TelemetrySpan = {
   setStatus(_status: SpanStatusType) {
     return noopSpan;
   },
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   end() {},
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   finish() {},
 };
 
 /**
- * Create a TelemetrySpan wrapper around a Sentry span.
+ * Initialize telemetry - no-op.
  */
-function wrapSpan(span: Sentry.Span | undefined): TelemetrySpan {
-  if (!span) {
-    return noopSpan;
-  }
-  return {
-    startChild(context?: SpanContext) {
-      const child = Sentry.startInactiveSpan({
-        name: context?.name ?? context?.description ?? 'child',
-        op: context?.op,
-        attributes: context?.data as Record<string, string> | undefined,
-      });
-      return wrapSpan(child);
-    },
-    setData(key: string, value: unknown) {
-      span.setAttribute(key, value as string);
-      return this;
-    },
-    setTag(key: string, value: string) {
-      span.setAttribute(key, value);
-      return this;
-    },
-    setStatus(status: SpanStatusType) {
-      span.setStatus({code: status === 'ok' ? 1 : 2, message: status});
-      return this;
-    },
-    end() {
-      span.end();
-    },
-    finish() {
-      span.end();
-    },
-  };
-}
+export function init(_options?: unknown): void {}
 
 /**
- * Initialize Sentry if telemetry is enabled.
- * DSN can be provided via options or via environment variable
- * (PROLINK_CONNECT_SENTRY_DSN or SENTRY_DSN).
+ * Start a transaction/span - returns no-op.
  */
-export function init(options?: Sentry.NodeOptions): void {
-  if (!isTelemetryEnabled()) {
-    return;
-  }
-
-  const dsn = options?.dsn ?? getSentryDsn();
-  if (!dsn) {
-    return;
-  }
-
-  Sentry.init({
-    ...options,
-    dsn,
-  });
-}
-
-/**
- * Start a transaction/span if telemetry is enabled, otherwise return a no-op.
- */
-export function startTransaction(context: SpanContext): TelemetrySpan {
-  if (isTelemetryEnabled()) {
-    const span = Sentry.startInactiveSpan({
-      name: context.name ?? context.description ?? 'transaction',
-      op: context.op,
-      forceTransaction: true,
-      attributes: context.data as Record<string, string> | undefined,
-    });
-    return wrapSpan(span);
-  }
+export function startTransaction(_context: SpanContext): TelemetrySpan {
   return noopSpan;
 }
 
 /**
- * Capture an exception if telemetry is enabled.
+ * Capture an exception - no-op.
  */
 export function captureException(
-  exception: unknown,
-  hint?: Parameters<typeof Sentry.captureException>[1]
+  _exception: unknown,
+  _hint?: unknown
 ): string {
-  if (isTelemetryEnabled()) {
-    return Sentry.captureException(exception, hint);
-  }
   return '';
 }
 
 /**
- * Capture a message if telemetry is enabled.
+ * Capture a message - no-op.
  */
 export function captureMessage(
-  message: string,
-  level?: Sentry.SeverityLevel | Parameters<typeof Sentry.captureMessage>[1]
+  _message: string,
+  _level?: unknown
 ): string {
-  if (isTelemetryEnabled()) {
-    return Sentry.captureMessage(message, level);
-  }
   return '';
 }
 
 /**
- * Set a tag if telemetry is enabled.
+ * Set a tag - no-op.
  */
-export function setTag(key: string, value: string): void {
-  if (isTelemetryEnabled()) {
-    Sentry.setTag(key, value);
-  }
-}
+export function setTag(_key: string, _value: string): void {}
 
 /**
  * Severity levels for messages.
