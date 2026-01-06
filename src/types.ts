@@ -21,7 +21,9 @@ export type {
 } from './entities';
 export type {HydrationProgress} from './localdb/rekordbox';
 export type {MixstatusConfig, MixstatusProcessor} from './mixstatus';
-export type {ConnectedProlinkNetwork, NetworkConfig, ProlinkNetwork} from './network';
+// Note: ProlinkNetwork is exported as a class from ./network, not re-exported here as type-only
+// to preserve method signatures like close()
+export type {ConnectedProlinkNetwork, NetworkConfig} from './network';
 export type {FetchProgress} from './nfs';
 
 /**

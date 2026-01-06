@@ -199,8 +199,8 @@ export class ProlinkNetwork {
    * You may need to disconnect and re-connect the network after making a
    * networking configuration change.
    */
-  configure(config: NetworkConfig) {
-    this.#config = {...this.#config, ...config};
+  configure(config: Partial<NetworkConfig>) {
+    this.#config = {...this.#config, ...config} as NetworkConfig;
   }
 
   /**
