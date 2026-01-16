@@ -293,12 +293,14 @@ class RekordboxHydrator {
     let totalSaved = 0;
     let totalItems = 0;
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const countStart = PROFILE ? performance.now() : 0;
-    for (const _ of tableRows(table)) {
+    for (const _row of tableRows(table)) {
+      void _row; // Intentionally unused - just counting
       totalItems++;
     }
-    if (PROFILE) profile.countLoop = performance.now() - countStart;
+    if (PROFILE) {
+      profile.countLoop = performance.now() - countStart;
+    }
 
     tx.setData('items', totalItems);
 
@@ -309,11 +311,15 @@ class RekordboxHydrator {
       for (const row of tableRows(table)) {
         const createStart = PROFILE ? performance.now() : 0;
         const entity = createObject(row);
-        if (PROFILE) profile.entityCreation += performance.now() - createStart;
+        if (PROFILE) {
+          profile.entityCreation += performance.now() - createStart;
+        }
 
         const insertStart = PROFILE ? performance.now() : 0;
         this.#orm.insertEntity(tableName, entity);
-        if (PROFILE) profile.sqliteInsert += performance.now() - insertStart;
+        if (PROFILE) {
+          profile.sqliteInsert += performance.now() - insertStart;
+        }
 
         totalSaved++;
 
@@ -323,7 +329,9 @@ class RekordboxHydrator {
           // Yield to event loop periodically to keep UI responsive
           const yieldStart = PROFILE ? performance.now() : 0;
           await new Promise(r => setTimeout(r, 0));
-          if (PROFILE) profile.yieldTime += performance.now() - yieldStart;
+          if (PROFILE) {
+            profile.yieldTime += performance.now() - yieldStart;
+          }
         }
       }
     } finally {

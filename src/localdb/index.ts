@@ -297,7 +297,7 @@ class LocalDatabase {
 
     // Acquire a lock for this device slot that will not release until we've
     // guaranteed the existence of the database.
-    const db = await lock.runExclusive(async () => {
+    const db = await lock.runExclusive(() => {
       const cached = this.#dbs.find(db => db.id === id);
       if (cached) {
         debugLog(`get: Found cached database for ${id}`);

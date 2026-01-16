@@ -71,14 +71,20 @@ const noopSpan: TelemetrySpan = {
   setStatus(_status: SpanStatusType) {
     return noopSpan;
   },
-  end() {},
-  finish() {},
+  end() {
+    // Intentional no-op
+  },
+  finish() {
+    // Intentional no-op
+  },
 };
 
 /**
  * Initialize telemetry - no-op.
  */
-export function init(_options?: unknown): void {}
+export function init(_options?: unknown): void {
+  // Intentional no-op
+}
 
 /**
  * Start a transaction/span - returns no-op.
@@ -104,7 +110,9 @@ export function captureMessage(_message: string, _level?: unknown): string {
 /**
  * Set a tag - no-op.
  */
-export function setTag(_key: string, _value: string): void {}
+export function setTag(_key: string, _value: string): void {
+  // Intentional no-op
+}
 
 /**
  * Severity levels for messages.
