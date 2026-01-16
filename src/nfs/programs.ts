@@ -8,7 +8,7 @@ import {FetchProgress} from '.';
 /**
  * How many bytes of a file should we read at once.
  */
-const READ_SIZE = 2048;
+const READ_SIZE = 8192;
 
 interface Program {
   id: number;
