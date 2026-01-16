@@ -7,10 +7,47 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
-- Bumped many pacakges
+## [v0.14.0] - 2026-01-16
+
+### Changed
+
+- Optimized database hydration with SQLite transactions (10-100x faster)
+- Added prepared statement caching for bulk inserts
+- Batched progress updates every 100 rows instead of every row
+- Fixed NFS buffer handling for reliable database streaming
+- Added error handling for media slot queries (returns null instead of throwing)
+
+### Added
+
+- Optional profiling via `NP_PROFILE_HYDRATION=1` environment variable
+- Optional debug logging via `NP_PRODJLINK_TAG=1` environment variable
+
+## [v0.13.0] - 2025-12-15
+
+### Added
+
+- CDJ-3000 support with absolute position packet handling
+- 6-channel on-air support for DJM-V10 mixers
+- Extended ANLZ features (PCO2, PSSI, enhanced waveforms)
+- Full DJ Link startup protocol (optional, for CDJ-3000 compatibility)
+- Socket reuse option for Rekordbox coexistence
+- Configurable virtual CDJ name via `network.configure({ vcdjName })`
+- Configurable Sentry DSN via `PROLINK_CONNECT_SENTRY_DSN` environment variable
+- Optional telemetry for performance monitoring
+
+### Changed
+
 - Require Node 20 minimum version
-- Fixed a typo in `ItemType.OriginalArtist` (was mispelled as `OrigianlArtist`)
-- Small comment correction for vCDJ ID on `autoconfigFromPeers`
+- Replaced js-xdr internal imports with local implementations for better bundling
+- Virtual CDJ now identifies as "Now Playing" on the ProLink network
+- Bumped all dependencies to latest versions
+
+### Fixed
+
+- TypeScript type union order in field declarations
+- Fixed a typo in `ItemType.OriginalArtist` (was misspelled as `OrigianlArtist`)
+- Network handling improvements for stability
+- Lint errors and test compatibility
 
 ## [v0.11.0] - 2022-10-24
 
