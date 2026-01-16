@@ -90,20 +90,14 @@ export function startTransaction(_context: SpanContext): TelemetrySpan {
 /**
  * Capture an exception - no-op.
  */
-export function captureException(
-  _exception: unknown,
-  _hint?: unknown
-): string {
+export function captureException(_exception: unknown, _hint?: unknown): string {
   return '';
 }
 
 /**
  * Capture a message - no-op.
  */
-export function captureMessage(
-  _message: string,
-  _level?: unknown
-): string {
+export function captureMessage(_message: string, _level?: unknown): string {
   return '';
 }
 
