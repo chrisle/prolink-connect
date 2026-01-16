@@ -233,19 +233,33 @@ class RekordboxHydrator {
    * connection with entities derived from the rekordbox entries.
    */
   async hydrateFromPdb(pdbData: Buffer, span?: Span) {
+    const PROFILE = process.env.NP_PROFILE_HYDRATION === '1';
+
     const tx = span
       ? span.startChild({op: 'hydrateFromPdb'})
       : Telemetry.startTransaction({name: 'hydrateFromPdb'});
 
     const parseTx = tx.startChild({op: 'parsePdbData', data: {size: pdbData.length}});
+    const parseStart = PROFILE ? performance.now() : 0;
     const stream = new KaitaiStream(pdbData);
     const db = new RekordboxPdb(stream);
+    if (PROFILE) {
+      console.log(
+        `[HYDRATION PROFILE] PDB parsing: ${(performance.now() - parseStart).toFixed(1)}ms (${(pdbData.length / 1024 / 1024).toFixed(2)} MB)`
+      );
+    }
     parseTx.finish();
 
     const hydrateTx = tx.startChild({op: 'hydration'});
+    const hydrateStart = PROFILE ? performance.now() : 0;
     await Promise.all(
       db.tables.map((table: any) => this.hydrateFromTable(table, hydrateTx))
     );
+    if (PROFILE) {
+      console.log(
+        `[HYDRATION PROFILE] Total hydration: ${(performance.now() - hydrateStart).toFixed(1)}ms`
+      );
+    }
     hydrateTx.finish();
 
     tx.finish();
@@ -265,22 +279,68 @@ class RekordboxHydrator {
       return;
     }
 
+    // Profiling: track time spent in each phase
+    const PROFILE = process.env.NP_PROFILE_HYDRATION === '1';
+    const profile = {
+      countLoop: 0,
+      entityCreation: 0,
+      sqliteInsert: 0,
+      yieldTime: 0,
+      total: 0,
+    };
+    const profileStart = PROFILE ? performance.now() : 0;
+
     let totalSaved = 0;
     let totalItems = 0;
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const countStart = PROFILE ? performance.now() : 0;
     for (const _ of tableRows(table)) {
       totalItems++;
     }
+    if (PROFILE) profile.countLoop = performance.now() - countStart;
 
     tx.setData('items', totalItems);
 
-    for (const row of tableRows(table)) {
-      this.#orm.insertEntity(tableName, createObject(row));
-      this.#onProgress({complete: ++totalSaved, table: tableName, total: totalItems});
+    // Use transaction for bulk inserts (10-100x faster)
+    this.#orm.beginTransaction();
 
-      // Allow additional tasks to occur during hydration
-      await new Promise(r => setTimeout(r, 0));
+    try {
+      for (const row of tableRows(table)) {
+        const createStart = PROFILE ? performance.now() : 0;
+        const entity = createObject(row);
+        if (PROFILE) profile.entityCreation += performance.now() - createStart;
+
+        const insertStart = PROFILE ? performance.now() : 0;
+        this.#orm.insertEntity(tableName, entity);
+        if (PROFILE) profile.sqliteInsert += performance.now() - insertStart;
+
+        totalSaved++;
+
+        // Report progress and yield every 100 rows (instead of every row)
+        if (totalSaved % 100 === 0 || totalSaved === totalItems) {
+          this.#onProgress({complete: totalSaved, table: tableName, total: totalItems});
+          // Yield to event loop periodically to keep UI responsive
+          const yieldStart = PROFILE ? performance.now() : 0;
+          await new Promise(r => setTimeout(r, 0));
+          if (PROFILE) profile.yieldTime += performance.now() - yieldStart;
+        }
+      }
+    } finally {
+      this.#orm.commit();
+    }
+
+    if (PROFILE) {
+      profile.total = performance.now() - profileStart;
+      console.log(`[HYDRATION PROFILE] ${tableName} (${totalItems} rows):`);
+      console.log(`  Count loop:      ${profile.countLoop.toFixed(1)}ms`);
+      console.log(`  Entity creation: ${profile.entityCreation.toFixed(1)}ms`);
+      console.log(`  SQLite insert:   ${profile.sqliteInsert.toFixed(1)}ms`);
+      console.log(`  Yield time:      ${profile.yieldTime.toFixed(1)}ms`);
+      console.log(`  Total:           ${profile.total.toFixed(1)}ms`);
+      console.log(
+        `  Unaccounted:     ${(profile.total - profile.countLoop - profile.entityCreation - profile.sqliteInsert - profile.yieldTime).toFixed(1)}ms`
+      );
     }
 
     tx.finish();
