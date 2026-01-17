@@ -239,3 +239,58 @@ export async function fetchFile(
 
   return data;
 }
+
+/**
+ * Fetch a range of bytes from a file on the remote NFS server.
+ * Unlike fetchFile, this only reads the specified range.
+ */
+export async function fetchFileRange(
+  conn: RpcProgram,
+  file: FileInfo,
+  offset: number,
+  length: number,
+  span?: Span
+): Promise<Buffer> {
+  const {handle, name} = file;
+  const data = Buffer.alloc(length);
+
+  const tx = span?.startChild({
+    op: 'downloadRange',
+    description: name,
+    data: {offset, length},
+  });
+
+  let bytesRead = 0;
+
+  while (bytesRead < length) {
+    const chunkSize = Math.min(READ_SIZE, length - bytesRead);
+    const readArgs = new nfs.ReadArgs({
+      handle,
+      offset: offset + bytesRead,
+      count: chunkSize,
+      totalCount: 0,
+    });
+
+    const resp = await conn.call({
+      procedure: nfs.Procedure.read().value,
+      data: readArgs.toXDR(),
+    });
+
+    const dataResp = nfs.ReadResponse.fromXDR(resp);
+    if (dataResp.arm() !== 'success') {
+      throw new Error(`Failed to read file at offset ${offset + bytesRead}`);
+    }
+
+    const buffer = dataResp.success().data();
+    if (buffer.length === 0) {
+      break;
+    }
+
+    data.set(buffer, bytesRead);
+    bytesRead += buffer.length;
+  }
+
+  tx?.finish();
+
+  return bytesRead < length ? data.subarray(0, bytesRead) : data;
+}

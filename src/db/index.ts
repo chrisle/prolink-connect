@@ -14,6 +14,7 @@ import {getSlotName, getTrackTypeName} from 'src/utils';
 import * as Telemetry from 'src/utils/telemetry';
 import {SpanStatus} from 'src/utils/telemetry';
 
+import * as GetArtworkFromFile from './getArtworkFromFile';
 import * as GetArtworkThumbnail from './getArtworkThumbnail';
 import * as GetFile from './getFile';
 import * as GetMetadata from './getMetadata';
@@ -201,6 +202,36 @@ class Database {
     if (strategy === LookupStrategy.NoneAvailable) {
       tx.setStatus(SpanStatus.Unavailable);
     }
+
+    tx.finish();
+
+    return artwork;
+  }
+
+  /**
+   * Extracts artwork directly from the audio file itself via NFS.
+   * Use this when you need higher resolution artwork than the thumbnail.
+   */
+  async getArtworkFromFile(opts: GetArtworkFromFile.Options) {
+    const {deviceId, trackSlot, span} = opts;
+
+    const tx = span
+      ? span.startChild({op: 'dbGetArtworkFromFile'})
+      : Telemetry.startTransaction({name: 'dbGetArtworkFromFile'});
+
+    tx.setTag('deviceId', deviceId.toString());
+    tx.setTag('trackSlot', getSlotName(trackSlot));
+
+    const callOpts = {...opts, span: tx};
+
+    const device = await this.#deviceManager.getDeviceEnsured(deviceId);
+    if (device === null) {
+      tx.setStatus(SpanStatus.NotFound);
+      tx.finish();
+      return null;
+    }
+
+    const artwork = await GetArtworkFromFile.viaFileExtraction(device, callOpts);
 
     tx.finish();
 
