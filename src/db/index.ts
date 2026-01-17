@@ -168,7 +168,12 @@ class Database {
   }
 
   /**
-   * Retrieves the artwork for a track on a specific device slot.
+   * Retrieves the low-resolution artwork thumbnail from the rekordbox database.
+   *
+   * This returns the pre-generated thumbnail stored in the rekordbox database,
+   * which is typically small (around 80x80 pixels).
+   *
+   * For full-resolution artwork extracted from the audio file, use getArtwork().
    */
   async getArtworkThumbnail(opts: GetArtworkThumbnail.Options) {
     const {deviceId, trackType, trackSlot, span} = opts;
@@ -209,15 +214,21 @@ class Database {
   }
 
   /**
-   * Extracts artwork directly from the audio file itself via NFS.
-   * Use this when you need higher resolution artwork than the thumbnail.
+   * Retrieves artwork for a track by extracting it from the audio file via NFS.
+   *
+   * This is the primary method for getting artwork. It reads embedded artwork
+   * from the audio file (ID3 tags for MP3, metadata atoms for M4A, PICTURE
+   * blocks for FLAC, etc.) using partial file reads to minimize data transfer.
+   *
+   * For low-resolution thumbnails from the rekordbox database, use
+   * getArtworkThumbnail() instead.
    */
-  async getArtworkFromFile(opts: GetArtworkFromFile.Options) {
+  async getArtwork(opts: GetArtworkFromFile.Options) {
     const {deviceId, trackSlot, span} = opts;
 
     const tx = span
-      ? span.startChild({op: 'dbGetArtworkFromFile'})
-      : Telemetry.startTransaction({name: 'dbGetArtworkFromFile'});
+      ? span.startChild({op: 'dbGetArtwork'})
+      : Telemetry.startTransaction({name: 'dbGetArtwork'});
 
     tx.setTag('deviceId', deviceId.toString());
     tx.setTag('trackSlot', getSlotName(trackSlot));
