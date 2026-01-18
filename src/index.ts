@@ -3,6 +3,9 @@ export * from './mixstatus';
 export * from './network';
 export {default as PositionEmitter} from './status/position';
 
+// Passive mode (pcap-based monitoring without announcing a VCDJ)
+export * from './passive';
+
 // Artwork extraction
 export {
   extractArtwork,
