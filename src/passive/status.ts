@@ -7,6 +7,8 @@ import {CDJStatus, MediaSlotInfo} from 'src/types';
 
 import {PacketInfo, PcapAdapter} from './pcap-adapter';
 
+const DEBUG = process.env.NP_PRODJLINK_TAG === '1';
+
 interface StatusEvents {
   /**
    * Fired each time the CDJ reports its status
@@ -67,6 +69,11 @@ export class PassiveStatusEmitter {
       const mediaSlot = mediaSlotFromPacket(message);
 
       if (mediaSlot !== undefined) {
+        if (DEBUG) {
+          console.log(
+            `[PassiveStatus] mediaSlot received: device=${mediaSlot.deviceId} slot=${mediaSlot.slot} name="${mediaSlot.name}" tracks=${mediaSlot.trackCount}`
+          );
+        }
         return this.#emitter.emit('mediaSlot', mediaSlot);
       }
 
@@ -75,6 +82,17 @@ export class PassiveStatusEmitter {
 
       if (onAir !== undefined) {
         return this.#emitter.emit('onAir', onAir);
+      }
+
+      // Debug: log unrecognized packets (except common ones we know about)
+      if (DEBUG && message.length > 0x0a) {
+        const packetType = message[0x0a];
+        // Skip: 0x0a (status), 0x06 (mediaSlot), 0x29 (device keepalive)
+        if (packetType !== 0x0a && packetType !== 0x06 && packetType !== 0x29) {
+          console.log(
+            `[PassiveStatus] Unknown packet type=0x${packetType.toString(16).padStart(2, '0')} len=${message.length} first32=${message.slice(0, 32).toString('hex')}`
+          );
+        }
       }
     } catch {
       // Ignore malformed packets

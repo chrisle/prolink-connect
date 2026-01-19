@@ -246,26 +246,31 @@ export class PassiveLocalDatabase {
    *
    * This method uses cached media slot info that was received from
    * broadcast packets. If no media info is cached for this slot,
-   * use getWithMedia() instead.
+   * it will attempt to fetch the database without media info (useful
+   * for all-in-one units like XDJ-XZ that don't broadcast mediaSlot).
    *
-   * @returns null if no cached media info or no rekordbox media present
+   * @returns null if no rekordbox media present or fetch fails
    */
   get(deviceId: DeviceID, slot: DatabaseSlot) {
     const cachedMedia = this.getCachedMedia(deviceId, slot);
-    if (!cachedMedia) {
-      debugLog(
-        `get: No cached media info for device ${deviceId} slot ${getSlotName(slot)}`
-      );
-      return Promise.resolve(null);
-    }
-
     const device = this.#deviceManager.devices.get(deviceId);
+
     if (!device) {
       debugLog(`get: Device ${deviceId} not found in device manager`);
       return Promise.resolve(null);
     }
 
-    return this.getWithMedia(device, slot, cachedMedia);
+    if (cachedMedia) {
+      return this.getWithMedia(device, slot, cachedMedia);
+    }
+
+    // No cached media - try fetching without media info
+    // This is needed for all-in-one units (XDJ-XZ, XDJ-RX) that don't
+    // broadcast mediaSlot info packets
+    debugLog(
+      `get: No cached media info for device ${deviceId} slot ${getSlotName(slot)}, attempting fetch without media info`
+    );
+    return this.getWithoutMedia(device, slot);
   }
 
   /**
@@ -319,6 +324,84 @@ export class PassiveLocalDatabase {
 
     debugLog(`getWithMedia: Completed for device ${device.id} slot ${slotName}`);
     return db.orm;
+  }
+
+  /**
+   * Attempts to get/hydrate a database without cached media slot info.
+   * This is used for all-in-one units (XDJ-XZ, XDJ-RX, etc.) that don't
+   * broadcast mediaSlot info packets.
+   *
+   * The method will try to fetch the rekordbox export.pdb file directly
+   * via NFS. If successful, the database is hydrated and cached.
+   *
+   * @returns null if no rekordbox database found or fetch fails
+   */
+  async getWithoutMedia(device: Device, slot: DatabaseSlot) {
+    const slotName = getSlotName(slot);
+    debugLog(`getWithoutMedia: Starting for device ${device.id} slot ${slotName}`);
+
+    const lockKey = `${device.id}-${slot}-nomedia`;
+    const lock =
+      this.#slotLocks.get(lockKey) ??
+      this.#slotLocks.set(lockKey, new Mutex()).get(lockKey)!;
+
+    if (device.type !== DeviceType.CDJ) {
+      debugLog(`getWithoutMedia: Device ${device.id} is not a CDJ (type: ${device.type})`);
+      return null;
+    }
+
+    // Check if we already have a cached database for this device/slot
+    const cacheKey = `${device.id}-${slot}`;
+    const existingDb = this.#dbs.find(
+      db => db.media.deviceId === device.id && db.media.slot === slot
+    );
+    if (existingDb) {
+      debugLog(`getWithoutMedia: Found existing cached database for ${cacheKey}`);
+      return existingDb.orm;
+    }
+
+    try {
+      const db = await lock.runExclusive(async () => {
+        // Double-check cache inside lock
+        const cached = this.#dbs.find(
+          db => db.media.deviceId === device.id && db.media.slot === slot
+        );
+        if (cached) {
+          debugLog(`getWithoutMedia: Found cached database for ${cacheKey}`);
+          return cached;
+        }
+
+        debugLog(
+          `getWithoutMedia: No cache, attempting hydration for device ${device.id} slot ${slotName}...`
+        );
+
+        // Create synthetic media info - we assume rekordbox since we're
+        // attempting to fetch a rekordbox database
+        const syntheticMedia: MediaSlotInfo = {
+          deviceId: device.id,
+          slot,
+          name: 'Unknown Media',
+          color: 0,
+          createdDate: new Date(0),
+          freeBytes: BigInt(0),
+          totalBytes: BigInt(0),
+          tracksType: TrackType.RB,
+          trackCount: 0,
+          playlistCount: 0,
+          hasSettings: false,
+        };
+
+        return this.#hydrateDatabase(device, slot, syntheticMedia);
+      });
+
+      debugLog(`getWithoutMedia: Completed for device ${device.id} slot ${slotName}`);
+      return db.orm;
+    } catch (error) {
+      debugLog(
+        `getWithoutMedia: Failed for device ${device.id} slot ${slotName}: ${error}`
+      );
+      return null;
+    }
   }
 
   /**
