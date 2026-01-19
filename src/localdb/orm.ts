@@ -1,4 +1,4 @@
-import sqlite3 from 'better-sqlite3';
+import sqlite3 from 'better-sqlite3-multiple-ciphers';
 import {camelCase, mapKeys, mapValues, partition, snakeCase} from 'lodash';
 
 import {EntityFK, Playlist, PlaylistEntry, Track} from 'src/entities';

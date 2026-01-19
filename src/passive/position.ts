@@ -1,10 +1,11 @@
 import StrictEventEmitter from 'strict-event-emitter-types';
+
 import {EventEmitter} from 'events';
 
 import {positionFromPacket} from 'src/status/utils';
 import {CDJStatus} from 'src/types';
 
-import {PcapAdapter, PacketInfo} from './pcap-adapter';
+import {PacketInfo, PcapAdapter} from './pcap-adapter';
 
 interface PositionEvents {
   /**

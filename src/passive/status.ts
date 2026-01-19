@@ -1,10 +1,11 @@
 import StrictEventEmitter from 'strict-event-emitter-types';
+
 import {EventEmitter} from 'events';
 
 import {mediaSlotFromPacket, onAirFromPacket, statusFromPacket} from 'src/status/utils';
 import {CDJStatus, MediaSlotInfo} from 'src/types';
 
-import {PcapAdapter, PacketInfo} from './pcap-adapter';
+import {PacketInfo, PcapAdapter} from './pcap-adapter';
 
 interface StatusEvents {
   /**

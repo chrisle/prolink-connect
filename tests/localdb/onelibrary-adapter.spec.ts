@@ -7,8 +7,8 @@
  * These tests verify all adapter functionality without needing real hardware.
  */
 
-import * as path from 'path';
 import * as fs from 'fs';
+import * as path from 'path';
 
 import {OneLibraryAdapter} from 'src/localdb/onelibrary';
 import {CueAndLoop} from 'src/types';
@@ -238,9 +238,7 @@ describeIfFixture('OneLibraryAdapter', () => {
 
       it('identifies loop (has outUsec)', () => {
         const cues = adapter.findCues(1);
-        const loop = cues.find(
-          (c: CueAndLoop) => c.type === 'loop' && 'length' in c
-        );
+        const loop = cues.find((c: CueAndLoop) => c.type === 'loop' && 'length' in c);
 
         expect(loop).toBeDefined();
         if (loop && 'length' in loop) {
@@ -250,9 +248,7 @@ describeIfFixture('OneLibraryAdapter', () => {
 
       it('identifies hot loop (hot cue with loop)', () => {
         const cues = adapter.findCues(1);
-        const hotLoop = cues.find(
-          (c: CueAndLoop) => c.type === 'hot_loop'
-        );
+        const hotLoop = cues.find((c: CueAndLoop) => c.type === 'hot_loop');
 
         expect(hotLoop).toBeDefined();
         if (hotLoop && 'button' in hotLoop && 'length' in hotLoop) {
@@ -275,9 +271,7 @@ describeIfFixture('OneLibraryAdapter', () => {
 
       it('includes label (cueComment)', () => {
         const cues = adapter.findCues(1);
-        const hotCue = cues.find(
-          (c: CueAndLoop) => c.type === 'hot_cue'
-        );
+        const hotCue = cues.find((c: CueAndLoop) => c.type === 'hot_cue');
 
         expect(hotCue!.label).toBe('Drop');
       });

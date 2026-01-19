@@ -49,6 +49,7 @@ describe('Database Loading', () => {
     it('cannot read tables from non-encrypted database', () => {
       // Create a plain SQLite database (not encrypted)
       const tempPath = path.join(__dirname, 'fixtures', 'temp-plain.db');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const Database = require('better-sqlite3-multiple-ciphers');
       const plainDb = new Database(tempPath);
       plainDb.exec('CREATE TABLE djmdContent (id INTEGER)');
@@ -109,6 +110,7 @@ describe('Database Loading', () => {
   // ==========================================================================
   describe('media identification', () => {
     it('creates unique ID based on media properties', () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const {createHash} = require('crypto');
 
       // Simplified media info for testing (using the same property types as actual LocalDatabase)
@@ -155,6 +157,7 @@ describe('Database Loading', () => {
     });
 
     it('creates same ID for identical media', () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const {createHash} = require('crypto');
 
       const getMediaId = (info: {
@@ -233,6 +236,7 @@ describe('Database Loading', () => {
   // ==========================================================================
   describe('temp file handling', () => {
     it('generates unique temp file paths', () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const os = require('os');
       const tmpDir = os.tmpdir();
 
@@ -248,13 +252,17 @@ describe('Database Loading', () => {
     });
 
     it('temp file path follows expected pattern', () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const os = require('os');
       const tmpDir = os.tmpdir();
       const deviceId = 3;
       const slot = MediaSlot.SD;
       const timestamp = 1234567890;
 
-      const tempPath = path.join(tmpDir, `onelibrary-${deviceId}-${slot}-${timestamp}.db`);
+      const tempPath = path.join(
+        tmpDir,
+        `onelibrary-${deviceId}-${slot}-${timestamp}.db`
+      );
 
       expect(tempPath).toContain('onelibrary-');
       expect(tempPath).toContain(`-${deviceId}-`);

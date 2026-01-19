@@ -1,13 +1,22 @@
-import {Device} from 'src/types';
 import {getFileInfo, NfsMediaSlot} from 'src/nfs';
+import {Device} from 'src/types';
 
+import {
+  extractFromAiff,
+  extractFromFlac,
+  extractFromMp3,
+  extractFromMp4,
+} from './parsers';
 import {createNfsFileReader} from './reader';
 import {ExtractedArtwork, FileReader} from './types';
-import {extractFromMp3, extractFromMp4, extractFromFlac, extractFromAiff} from './parsers';
 
+export {
+  createBufferReader,
+  createNfsFileReader,
+  createNfsFileReaderWithInfo,
+} from './reader';
 export type {ExtractedArtwork, FileReader} from './types';
 export {PictureType} from './types';
-export {createNfsFileReader, createNfsFileReaderWithInfo, createBufferReader} from './reader';
 
 const SUPPORTED_EXTENSIONS = new Set(['mp3', 'm4a', 'mp4', 'aac', 'flac', 'aiff', 'aif']);
 
@@ -15,7 +24,9 @@ export function isArtworkExtractionSupported(extension: string): boolean {
   return SUPPORTED_EXTENSIONS.has(extension.toLowerCase());
 }
 
-export async function extractArtwork(reader: FileReader): Promise<ExtractedArtwork | null> {
+export async function extractArtwork(
+  reader: FileReader
+): Promise<ExtractedArtwork | null> {
   const ext = reader.extension.toLowerCase();
 
   switch (ext) {
@@ -30,10 +41,13 @@ export async function extractArtwork(reader: FileReader): Promise<ExtractedArtwo
     case 'aiff':
     case 'aif':
       return extractFromAiff(reader);
-    default:
+    default: {
       const mp3Result = await extractFromMp3(reader);
-      if (mp3Result) return mp3Result;
+      if (mp3Result) {
+        return mp3Result;
+      }
       return extractFromMp4(reader);
+    }
   }
 }
 

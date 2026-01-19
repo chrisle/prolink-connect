@@ -8,12 +8,12 @@
 
 import {
   create2EXFile,
+  createAnlzFile,
   createEXTFile,
   createPWV5Section,
   createPWV6Section,
   createPWV7Section,
   createPWVCSection,
-  createAnlzFile,
   SectionTags,
 } from './fixtures/anlz-fixtures';
 
@@ -281,9 +281,15 @@ describe('ANLZ Binary Fixtures', () => {
       // Search for section tags after header (offset 12)
       for (let i = 12; i < buffer.length - 4; i++) {
         const tag = buffer.readUInt32BE(i);
-        if (tag === SectionTags.WAVE_COLOR_3CHANNEL) foundPWV6 = true;
-        if (tag === SectionTags.WAVE_HD) foundPWV7 = true;
-        if (tag === SectionTags.VOCAL_CONFIG) foundPWVC = true;
+        if (tag === SectionTags.WAVE_COLOR_3CHANNEL) {
+          foundPWV6 = true;
+        }
+        if (tag === SectionTags.WAVE_HD) {
+          foundPWV7 = true;
+        }
+        if (tag === SectionTags.VOCAL_CONFIG) {
+          foundPWVC = true;
+        }
       }
 
       expect(foundPWV6).toBe(true);
@@ -303,9 +309,15 @@ describe('ANLZ Binary Fixtures', () => {
 
       for (let i = 12; i < buffer.length - 4; i++) {
         const tag = buffer.readUInt32BE(i);
-        if (tag === SectionTags.WAVE_COLOR_3CHANNEL) foundPWV6 = true;
-        if (tag === SectionTags.WAVE_HD) foundPWV7 = true;
-        if (tag === SectionTags.VOCAL_CONFIG) foundPWVC = true;
+        if (tag === SectionTags.WAVE_COLOR_3CHANNEL) {
+          foundPWV6 = true;
+        }
+        if (tag === SectionTags.WAVE_HD) {
+          foundPWV7 = true;
+        }
+        if (tag === SectionTags.VOCAL_CONFIG) {
+          foundPWVC = true;
+        }
       }
 
       expect(foundPWV6).toBe(true);
@@ -340,9 +352,15 @@ describe('ANLZ Binary Fixtures', () => {
   describe('data integrity', () => {
     it('preserves exact waveform data in PWV6', () => {
       const data = new Uint8Array([
-        255, 0, 128, // Entry 1: R=255, G=0, B=128
-        0, 255, 64, // Entry 2: R=0, G=255, B=64
-        100, 100, 100, // Entry 3: R=100, G=100, B=100
+        255,
+        0,
+        128, // Entry 1: R=255, G=0, B=128
+        0,
+        255,
+        64, // Entry 2: R=0, G=255, B=64
+        100,
+        100,
+        100, // Entry 3: R=100, G=100, B=100
       ]);
 
       const section = createPWV6Section({numEntries: 3, numChannels: 3, data});

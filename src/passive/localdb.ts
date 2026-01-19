@@ -1,12 +1,20 @@
 import {Mutex} from 'async-mutex';
 import StrictEventEmitter from 'strict-event-emitter-types';
+
 import {createHash} from 'crypto';
 import {EventEmitter} from 'events';
 
 import {MetadataORM} from 'src/localdb/orm';
 import {hydrateDatabase, HydrationProgress} from 'src/localdb/rekordbox';
 import {fetchFile, FetchProgress} from 'src/nfs';
-import {Device, DeviceID, DeviceType, MediaSlot, MediaSlotInfo, TrackType} from 'src/types';
+import {
+  Device,
+  DeviceID,
+  DeviceType,
+  MediaSlot,
+  MediaSlotInfo,
+  TrackType,
+} from 'src/types';
 import {getSlotName} from 'src/utils';
 import * as Telemetry from 'src/utils/telemetry';
 
@@ -162,7 +170,9 @@ export class PassiveLocalDatabase {
   #handleMediaSlot = (info: MediaSlotInfo) => {
     const key = `${info.deviceId}-${info.slot}`;
     this.#mediaCache.set(key, info);
-    debugLog(`Cached media slot info for device ${info.deviceId} slot ${getSlotName(info.slot)}`);
+    debugLog(
+      `Cached media slot info for device ${info.deviceId} slot ${getSlotName(info.slot)}`
+    );
   };
 
   #handleDeviceRemoved = (device: Device) => {
@@ -195,7 +205,8 @@ export class PassiveLocalDatabase {
         slot,
         path,
         span: tx,
-        onProgress: progress => this.#emitter.emit('fetchProgress', {device, slot, progress}),
+        onProgress: progress =>
+          this.#emitter.emit('fetchProgress', {device, slot, progress}),
       }));
 
     // Rekordbox exports to both the `.PIONEER` and `PIONEER` folder, depending
@@ -239,17 +250,19 @@ export class PassiveLocalDatabase {
    *
    * @returns null if no cached media info or no rekordbox media present
    */
-  async get(deviceId: DeviceID, slot: DatabaseSlot) {
+  get(deviceId: DeviceID, slot: DatabaseSlot) {
     const cachedMedia = this.getCachedMedia(deviceId, slot);
     if (!cachedMedia) {
-      debugLog(`get: No cached media info for device ${deviceId} slot ${getSlotName(slot)}`);
-      return null;
+      debugLog(
+        `get: No cached media info for device ${deviceId} slot ${getSlotName(slot)}`
+      );
+      return Promise.resolve(null);
     }
 
     const device = this.#deviceManager.devices.get(deviceId);
     if (!device) {
       debugLog(`get: Device ${deviceId} not found in device manager`);
-      return null;
+      return Promise.resolve(null);
     }
 
     return this.getWithMedia(device, slot, cachedMedia);
@@ -270,7 +283,8 @@ export class PassiveLocalDatabase {
 
     const lockKey = `${device.id}-${slot}`;
     const lock =
-      this.#slotLocks.get(lockKey) ?? this.#slotLocks.set(lockKey, new Mutex()).get(lockKey)!;
+      this.#slotLocks.get(lockKey) ??
+      this.#slotLocks.set(lockKey, new Mutex()).get(lockKey)!;
 
     if (device.type !== DeviceType.CDJ) {
       debugLog(`getWithMedia: Device ${device.id} is not a CDJ (type: ${device.type})`);

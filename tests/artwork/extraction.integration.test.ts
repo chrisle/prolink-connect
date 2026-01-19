@@ -1,7 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import {createBufferReader} from 'src/artwork/reader';
+
 import {extractArtwork} from 'src/artwork';
+import {createBufferReader} from 'src/artwork/reader';
 
 /**
  * Integration tests that verify artwork extraction works with real audio files.
@@ -104,9 +105,13 @@ describe('Artwork Extraction Integration', () => {
         expect(result.data.length).toBeGreaterThan(0);
         expect(['image/jpeg', 'image/png', 'image/gif']).toContain(result.mimeType);
         if (result.width && result.height) {
-          console.log(`Extracted ${result.mimeType} artwork: ${result.width}x${result.height}, ${result.data.length} bytes`);
+          console.log(
+            `Extracted ${result.mimeType} artwork: ${result.width}x${result.height}, ${result.data.length} bytes`
+          );
         } else {
-          console.log(`Extracted ${result.mimeType} artwork: ${result.data.length} bytes`);
+          console.log(
+            `Extracted ${result.mimeType} artwork: ${result.data.length} bytes`
+          );
         }
       } else {
         console.log('No artwork found in sample.flac');
@@ -122,11 +127,16 @@ describe('Artwork Extraction Integration', () => {
       // Find a few MP3 files to test (including one known to have artwork)
       const testFiles = [
         path.join(musicDir, 'Piezo/vocal future.mp3'),
-        path.join(musicDir, 'Music/Media.localized/Music/triode/Unknown Album/Country Pop (Vocals).mp3'),
+        path.join(
+          musicDir,
+          'Music/Media.localized/Music/triode/Unknown Album/Country Pop (Vocals).mp3'
+        ),
       ];
 
       for (const filePath of testFiles) {
-        if (!fileExists(filePath)) continue;
+        if (!fileExists(filePath)) {
+          continue;
+        }
 
         const reader = createReaderFromFile(filePath);
         const result = await extractArtwork(reader);
@@ -187,7 +197,9 @@ describe('Artwork Extraction Integration', () => {
         }
       }
 
-      console.log(`\nResults: ${successCount}/${testedCount} tracks had artwork extracted`);
+      console.log(
+        `\nResults: ${successCount}/${testedCount} tracks had artwork extracted`
+      );
 
       // Expect at least some files to be testable (SD card mounted)
       if (testedCount > 0) {

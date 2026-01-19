@@ -4,7 +4,7 @@
  */
 
 import {execSync} from 'child_process';
-import {networkInterfaces, type NetworkInterfaceInfo} from 'os';
+import {type NetworkInterfaceInfo, networkInterfaces} from 'os';
 
 /**
  * Known MAC address prefixes (OUI) for AlphaTheta/Pioneer DJ devices.
@@ -31,7 +31,6 @@ function isAlphaThetaMac(mac: string): boolean {
  * Handles both old (numeric) and new (string) Node.js family types.
  */
 function isIPv4(info: NetworkInterfaceInfo): boolean {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const family = info.family as any;
   return family === 'IPv4' || family === 4;
 }
@@ -123,7 +122,7 @@ function findAlphaThetaInterfaceMacOS(): AlphaThetaInterface | null {
     // Device: en15
     // Ethernet Address: c8:3d:fc:0a:58:54
     const blocks = networkSetupOutput.split(/\n\n+/);
-    const usbLanInterfaces: {name: string; mac: string}[] = [];
+    const usbLanInterfaces: Array<{name: string; mac: string}> = [];
 
     for (const block of blocks) {
       if (block.includes('USB 10/100 LAN') || block.includes('USB 10_100 LAN')) {
@@ -148,7 +147,9 @@ function findAlphaThetaInterfaceMacOS(): AlphaThetaInterface | null {
 
     for (const usbIface of usbLanInterfaces) {
       const nodeIface = interfaces[usbIface.name];
-      if (!nodeIface) continue;
+      if (!nodeIface) {
+        continue;
+      }
 
       // Find the IPv4 entry
       const ipv4Entry = nodeIface.find(isIPv4);
@@ -220,7 +221,9 @@ function findAlphaThetaInterfaceWindows(): AlphaThetaInterface | null {
     const targetMac = adapter.MacAddress?.replace(/-/g, ':').toLowerCase();
 
     for (const [ifaceName, ifaceInfos] of Object.entries(interfaces)) {
-      if (!ifaceInfos) continue;
+      if (!ifaceInfos) {
+        continue;
+      }
 
       for (const info of ifaceInfos) {
         if (info.mac.toLowerCase() === targetMac) {
@@ -400,7 +403,9 @@ function findAlphaThetaViaEthernet(): AlphaThetaInterface | null {
     if (!nodeIface) {
       // Try to find interface by IP address (Windows case)
       for (const [ifName, infos] of Object.entries(interfaces)) {
-        if (!infos) continue;
+        if (!infos) {
+          continue;
+        }
         for (const info of infos) {
           if (isIPv4(info) && info.address === arpIfaceName) {
             nodeIfaceName = ifName;
@@ -408,14 +413,20 @@ function findAlphaThetaViaEthernet(): AlphaThetaInterface | null {
             break;
           }
         }
-        if (nodeIface) break;
+        if (nodeIface) {
+          break;
+        }
       }
     }
 
-    if (!nodeIface) continue;
+    if (!nodeIface) {
+      continue;
+    }
 
     const ipv4Entry = nodeIface.find(isIPv4);
-    if (!ipv4Entry) continue;
+    if (!ipv4Entry) {
+      continue;
+    }
 
     return {
       name: nodeIfaceName,

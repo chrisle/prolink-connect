@@ -1,7 +1,7 @@
-import {Track} from 'src/entities';
 import {extractArtworkFromDevice, isArtworkExtractionSupported} from 'src/artwork';
-import {Device, DeviceID, MediaSlot} from 'src/types';
+import {Track} from 'src/entities';
 import {NfsMediaSlot} from 'src/nfs';
+import {Device, DeviceID, MediaSlot} from 'src/types';
 import {TelemetrySpan as Span} from 'src/utils/telemetry';
 import * as Telemetry from 'src/utils/telemetry';
 
@@ -31,10 +31,14 @@ export async function viaFileExtraction(
 
   const slot = trackSlot as NfsMediaSlot;
 
-  if (!track.filePath) return null;
+  if (!track.filePath) {
+    return null;
+  }
 
   const extension = track.filePath.split('.').pop()?.toLowerCase() ?? '';
-  if (!isArtworkExtractionSupported(extension)) return null;
+  if (!isArtworkExtractionSupported(extension)) {
+    return null;
+  }
 
   const tx = span
     ? span.startChild({op: 'getArtworkFromFile'})

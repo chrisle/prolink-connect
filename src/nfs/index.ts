@@ -209,7 +209,13 @@ export async function fetchFileRange({
     return Buffer.alloc(0);
   }
 
-  const data = await fetchFileRangeInternal(nfsClient, fileInfo, actualOffset, actualLength, tx);
+  const data = await fetchFileRangeInternal(
+    nfsClient,
+    fileInfo,
+    actualOffset,
+    actualLength,
+    tx
+  );
 
   tx.setData('path', path);
   tx.setData('slot', getSlotName(slot));

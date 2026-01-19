@@ -1,11 +1,12 @@
-import StrictEventEmitter from 'strict-event-emitter-types';
-import {EventEmitter} from 'events';
 import * as ip from 'ip-address';
+import StrictEventEmitter from 'strict-event-emitter-types';
+
+import {EventEmitter} from 'events';
 
 import {PROLINK_HEADER} from 'src/constants';
 import {Device, DeviceID, DeviceType} from 'src/types';
 
-import {PcapAdapter, PacketInfo} from './pcap-adapter';
+import {PacketInfo, PcapAdapter} from './pcap-adapter';
 
 /**
  * Parse a device from an announce packet, using the source IP from PacketInfo

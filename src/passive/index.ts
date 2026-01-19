@@ -1,3 +1,5 @@
+import {type NetworkInterfaceInfo, networkInterfaces} from 'os';
+
 import {MixstatusProcessor} from 'src/mixstatus';
 
 import {PassiveDeviceManager} from './devices';
@@ -7,17 +9,17 @@ import {PassivePositionEmitter} from './position';
 import {PassiveRemoteDatabase} from './remotedb';
 import {PassiveStatusEmitter} from './status';
 
-export {PcapAdapter, PcapAdapterConfig, PacketInfo} from './pcap-adapter';
-export {PassiveDeviceManager} from './devices';
-export {PassiveStatusEmitter} from './status';
-export {PassivePositionEmitter} from './position';
-export {PassiveLocalDatabase} from './localdb';
-export {PassiveRemoteDatabase} from './remotedb';
 export {
+  AlphaThetaInterface,
   findAlphaThetaInterface,
   getArpCacheForInterface,
-  AlphaThetaInterface,
 } from './alphatheta';
+export {PassiveDeviceManager} from './devices';
+export {PassiveLocalDatabase} from './localdb';
+export {PacketInfo, PcapAdapter, PcapAdapterConfig} from './pcap-adapter';
+export {PassivePositionEmitter} from './position';
+export {PassiveRemoteDatabase} from './remotedb';
+export {PassiveStatusEmitter} from './status';
 
 export interface PassiveNetworkConfig {
   /**
@@ -69,7 +71,9 @@ export class PassiveProlinkNetwork {
     // Only pass defined config values to avoid overwriting defaults with undefined
     this.#deviceManager = new PassiveDeviceManager(
       this.#adapter,
-      config.deviceTimeout !== undefined ? {deviceTimeout: config.deviceTimeout} : undefined
+      config.deviceTimeout !== undefined
+        ? {deviceTimeout: config.deviceTimeout}
+        : undefined
     );
 
     this.#statusEmitter = new PassiveStatusEmitter(this.#adapter);
@@ -213,9 +217,7 @@ export class PassiveProlinkNetwork {
  * @param config - Configuration including network interface name
  * @returns PassiveProlinkNetwork instance
  */
-export async function bringOnlinePassive(
-  config: PassiveNetworkConfig
-): Promise<PassiveProlinkNetwork> {
+export function bringOnlinePassive(config: PassiveNetworkConfig): PassiveProlinkNetwork {
   const network = new PassiveProlinkNetwork(config);
   network.start();
   return network;
@@ -234,22 +236,29 @@ export async function bringOnlinePassive(
  * // [{ name: 'en0', address: '192.168.1.100' }, { name: 'en15', address: '169.254.x.x' }]
  * ```
  */
-export function listInterfaces(): Array<{name: string; address: string; description?: string}> {
-  const os = require('os');
-  const networkInterfaces = os.networkInterfaces();
+export function listInterfaces(): Array<{
+  name: string;
+  address: string;
+  description?: string;
+}> {
+  const interfaces = networkInterfaces();
   const result: Array<{name: string; address: string; description?: string}> = [];
 
-  for (const [name, infos] of Object.entries(networkInterfaces)) {
-    if (!infos) continue;
+  for (const [name, infos] of Object.entries(interfaces)) {
+    if (!infos) {
+      continue;
+    }
 
-    for (const info of infos as Array<{family: string; address: string; internal: boolean}>) {
+    for (const info of infos as NetworkInterfaceInfo[]) {
       // Only include IPv4, non-internal interfaces
       if (info.family === 'IPv4' && !info.internal) {
         result.push({
           name,
           address: info.address,
           // USB-connected DJ hardware typically uses link-local addresses
-          description: info.address.startsWith('169.254.') ? 'Link-local (USB device?)' : undefined,
+          description: info.address.startsWith('169.254.')
+            ? 'Link-local (USB device?)'
+            : undefined,
         });
       }
     }

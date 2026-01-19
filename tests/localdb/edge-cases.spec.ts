@@ -5,7 +5,6 @@
  * in the OneLibrary adapter and related components.
  */
 
-import * as fs from 'fs';
 import * as path from 'path';
 
 import {OneLibraryAdapter} from 'src/localdb/onelibrary';

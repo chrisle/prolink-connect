@@ -1,13 +1,14 @@
 import {Mutex} from 'async-mutex';
 import PromiseSocket from 'promise-socket';
+
 import {Socket} from 'net';
 
-import {Device, DeviceID, MediaSlot, TrackType} from 'src/types';
-import {MenuTarget, Query, QueryInterface, Connection} from 'src/remotedb';
+import {Connection, MenuTarget, Query, QueryInterface} from 'src/remotedb';
+import {REMOTEDB_SERVER_QUERY_PORT} from 'src/remotedb/constants';
+import {readField, UInt32} from 'src/remotedb/fields';
 import {Message} from 'src/remotedb/message';
 import {MessageType} from 'src/remotedb/message/types';
-import {readField, UInt32} from 'src/remotedb/fields';
-import {REMOTEDB_SERVER_QUERY_PORT} from 'src/remotedb/constants';
+import {Device, DeviceID, MediaSlot, TrackType} from 'src/types';
 import * as Telemetry from 'src/utils/telemetry';
 
 import {PassiveDeviceManager} from './devices';
@@ -67,7 +68,7 @@ export class PassiveRemoteDatabase {
    */
   #deviceLocks = new Map<DeviceID, Mutex>();
 
-  constructor(deviceManager: PassiveDeviceManager, virtualDeviceId: number = 5) {
+  constructor(deviceManager: PassiveDeviceManager, virtualDeviceId = 5) {
     this.#deviceManager = deviceManager;
     this.#virtualDeviceId = virtualDeviceId;
   }
@@ -76,7 +77,10 @@ export class PassiveRemoteDatabase {
    * Open a connection to the specified device for querying
    */
   async connectToDevice(device: Device): Promise<void> {
-    const tx = Telemetry.startTransaction({name: 'passiveConnectRemotedb', data: {device}});
+    const tx = Telemetry.startTransaction({
+      name: 'passiveConnectRemotedb',
+      data: {device},
+    });
 
     const {ip} = device;
     const dbPort = await getRemoteDBServerPort(ip.address);
@@ -124,7 +128,10 @@ export class PassiveRemoteDatabase {
     }
 
     try {
-      const tx = Telemetry.startTransaction({name: 'passiveDisconnectFromDevice', data: {device}});
+      const tx = Telemetry.startTransaction({
+        name: 'passiveDisconnectFromDevice',
+        data: {device},
+      });
 
       const goodbye = new Message({
         transactionId: 0xfffffffe,

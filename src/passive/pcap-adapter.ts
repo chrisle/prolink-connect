@@ -1,4 +1,5 @@
 import StrictEventEmitter from 'strict-event-emitter-types';
+
 import {EventEmitter} from 'events';
 
 import {ANNOUNCE_PORT, BEAT_PORT, STATUS_PORT} from 'src/constants';
@@ -32,11 +33,17 @@ interface CapModule {
   decoders: {
     PROTOCOL: ProtocolConstants;
     Ethernet: (buf: Buffer) => {info: {type: number}; offset: number};
-    IPV4: (buf: Buffer, offset: number) => {
+    IPV4: (
+      buf: Buffer,
+      offset: number
+    ) => {
       info: {protocol: number; srcaddr: string; dstaddr: string; totallen: number};
       offset: number;
     };
-    UDP: (buf: Buffer, offset: number) => {
+    UDP: (
+      buf: Buffer,
+      offset: number
+    ) => {
       info: {srcport: number; dstport: number; length: number};
       offset: number;
     };
@@ -126,8 +133,9 @@ export class PcapAdapter {
     // Dynamic require to avoid bundling issues and allow optional dependency
     let cap: CapModule;
     try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       cap = require('cap') as CapModule;
-    } catch (err) {
+    } catch {
       throw new Error(
         'The "cap" module is required for passive mode. ' +
           'Install it with: npm install cap\n' +

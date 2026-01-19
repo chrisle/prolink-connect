@@ -1,18 +1,18 @@
-import {createBufferReader} from 'src/artwork/reader';
 import {extractArtwork} from 'src/artwork';
-import {PictureType} from 'src/artwork/types';
+import {extractFromAiff} from 'src/artwork/parsers/aiff';
+import {extractFromFlac} from 'src/artwork/parsers/flac';
 import {extractFromMp3} from 'src/artwork/parsers/id3';
 import {extractFromMp4} from 'src/artwork/parsers/mp4';
-import {extractFromFlac} from 'src/artwork/parsers/flac';
-import {extractFromAiff} from 'src/artwork/parsers/aiff';
+import {createBufferReader} from 'src/artwork/reader';
+import {PictureType} from 'src/artwork/types';
 
 import {
+  createAiffWithArtwork,
+  createFlacWithArtwork,
+  createMp3WithArtwork,
+  createMp4WithArtwork,
   TINY_JPEG,
   TINY_PNG,
-  createMp3WithArtwork,
-  createFlacWithArtwork,
-  createMp4WithArtwork,
-  createAiffWithArtwork,
 } from './fixtures';
 
 describe('Artwork Extraction', () => {

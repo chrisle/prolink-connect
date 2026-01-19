@@ -1,5 +1,5 @@
-import {Device} from 'src/types';
 import {fetchFileRange, getFileInfo, NfsMediaSlot} from 'src/nfs';
+import {Device} from 'src/types';
 
 import {FileReader} from './types';
 
@@ -17,9 +17,8 @@ export function createNfsFileReader(
   return {
     size: fileSize,
     extension,
-    read: async (offset: number, length: number): Promise<Buffer> => {
-      return fetchFileRange({device, slot, path, offset, length});
-    },
+    read: (offset: number, length: number): Promise<Buffer> =>
+      fetchFileRange({device, slot, path, offset, length}),
   };
 }
 
@@ -42,9 +41,9 @@ export function createBufferReader(buffer: Buffer, extension: string): FileReade
   return {
     size: buffer.length,
     extension,
-    read: async (offset: number, length: number): Promise<Buffer> => {
+    read: (offset: number, length: number): Promise<Buffer> => {
       const end = Math.min(offset + length, buffer.length);
-      return buffer.subarray(offset, end);
+      return Promise.resolve(buffer.subarray(offset, end));
     },
   };
 }
