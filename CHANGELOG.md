@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [v0.15.0] - 2026-01-19
+
+### Added
+
+- **Passive monitoring mode**: Monitor Pro DJ Link networks via packet capture (pcap) without joining the network as a virtual CDJ. Allows monitoring alongside rekordbox.
+- **Artwork extraction from audio files via NFS**: Extract album artwork directly from audio files (MP3, FLAC, AIFF, M4A) over NFS when artwork is not available in the rekordbox database.
+- **OneLibrary database support**: Full support for rekordbox 7.x's new OneLibrary format (exportLibrary.db) with SQLCipher encryption, including tracks, playlists, cues, hot cue banks, myTags, and history.
+- New ANLZ parsing for `.2EX` files (PWV6, PWV7, PWVC sections)
+- Comprehensive test suite for LocalDB and OneLibrary functionality
+
+### Changed
+
+- `getArtwork` is now the default method name (renamed from `getArtworkFromFile`)
+- `cap` moved to optionalDependencies for easier installation when passive mode is not needed
+
 ## [v0.14.0] - 2026-01-16
 
 ### Changed
@@ -226,7 +241,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Initial working implementation. This is currently being used to re-implement
   [prolink-tools](https://github.com/evanpurkhiser/prolink-tools).
 
-[unreleased]: https://github.com/evanpurkhiser/prolink-connect/compare/v0.11.0...HEAD
+[unreleased]: https://github.com/evanpurkhiser/prolink-connect/compare/v0.15.0...HEAD
+[v0.15.0]: https://github.com/evanpurkhiser/prolink-connect/compare/v0.14.0...v0.15.0
+[v0.14.0]: https://github.com/evanpurkhiser/prolink-connect/compare/v0.13.0...v0.14.0
+[v0.13.0]: https://github.com/evanpurkhiser/prolink-connect/compare/v0.11.0...v0.13.0
 [v0.11.0]: https://github.com/evanpurkhiser/prolink-connect/compare/v0.10.0...v0.11.0
 [v0.10.0]: https://github.com/evanpurkhiser/prolink-connect/compare/v0.9.0...v0.10.0
 [v0.9.0]: https://github.com/evanpurkhiser/prolink-connect/compare/v0.8.1...v0.9.0
