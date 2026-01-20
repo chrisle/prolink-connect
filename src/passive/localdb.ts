@@ -21,14 +21,6 @@ import * as Telemetry from 'src/utils/telemetry';
 import {PassiveDeviceManager} from './devices';
 import {PassiveStatusEmitter} from './status';
 
-// Debug logging for hydration
-const DEBUG = process.env.NP_PRODJLINK_TAG === '1';
-function debugLog(msg: string, ...args: any[]) {
-  if (DEBUG) {
-    console.log(`[PassiveLocalDB] ${msg}`, ...args);
-  }
-}
-
 /**
  * Rekordbox databases will only exist within these two slots
  */
@@ -91,7 +83,7 @@ const getMediaId = (info: MediaSlotInfo) => {
     info.createdDate,
   ];
 
-  return createHash('sha256').update(inputs.join('.'), 'utf8').digest().toString();
+  return createHash('sha256').update(inputs.join('.'), 'utf8').digest('hex');
 };
 
 /**
@@ -170,9 +162,6 @@ export class PassiveLocalDatabase {
   #handleMediaSlot = (info: MediaSlotInfo) => {
     const key = `${info.deviceId}-${info.slot}`;
     this.#mediaCache.set(key, info);
-    debugLog(
-      `Cached media slot info for device ${info.deviceId} slot ${getSlotName(info.slot)}`
-    );
   };
 
   #handleDeviceRemoved = (device: Device) => {
@@ -256,7 +245,6 @@ export class PassiveLocalDatabase {
     const device = this.#deviceManager.devices.get(deviceId);
 
     if (!device) {
-      debugLog(`get: Device ${deviceId} not found in device manager`);
       return Promise.resolve(null);
     }
 
@@ -267,9 +255,6 @@ export class PassiveLocalDatabase {
     // No cached media - try fetching without media info
     // This is needed for all-in-one units (XDJ-XZ, XDJ-RX) that don't
     // broadcast mediaSlot info packets
-    debugLog(
-      `get: No cached media info for device ${deviceId} slot ${getSlotName(slot)}, attempting fetch without media info`
-    );
     return this.getWithoutMedia(device, slot);
   }
 
@@ -283,46 +268,29 @@ export class PassiveLocalDatabase {
    * @returns null if no rekordbox media present
    */
   async getWithMedia(device: Device, slot: DatabaseSlot, media: MediaSlotInfo) {
-    const slotName = getSlotName(slot);
-    debugLog(`getWithMedia: Starting for device ${device.id} slot ${slotName}`);
-
     const lockKey = `${device.id}-${slot}`;
     const lock =
       this.#slotLocks.get(lockKey) ??
       this.#slotLocks.set(lockKey, new Mutex()).get(lockKey)!;
 
     if (device.type !== DeviceType.CDJ) {
-      debugLog(`getWithMedia: Device ${device.id} is not a CDJ (type: ${device.type})`);
       throw new Error('Cannot create database from devices that are not CDJs');
     }
 
-    debugLog(
-      `getWithMedia: Media info: tracksType=${media.tracksType}, trackCount=${media.trackCount}, name=${media.name}`
-    );
-
     if (media.tracksType !== TrackType.RB) {
-      debugLog(
-        `getWithMedia: Device ${device.id} slot ${slotName} is not rekordbox (type: ${media.tracksType})`
-      );
       return null;
     }
 
     const id = getMediaId(media);
-    debugLog(`getWithMedia: Media ID: ${id}, checking cache...`);
 
     const db = await lock.runExclusive(() => {
       const cached = this.#dbs.find(db => db.id === id);
       if (cached) {
-        debugLog(`getWithMedia: Found cached database for ${id}`);
         return cached;
       }
-      debugLog(
-        `getWithMedia: No cache, starting hydration for device ${device.id} slot ${slotName}...`
-      );
       return this.#hydrateDatabase(device, slot, media);
     });
 
-    debugLog(`getWithMedia: Completed for device ${device.id} slot ${slotName}`);
     return db.orm;
   }
 
@@ -337,43 +305,32 @@ export class PassiveLocalDatabase {
    * @returns null if no rekordbox database found or fetch fails
    */
   async getWithoutMedia(device: Device, slot: DatabaseSlot) {
-    const slotName = getSlotName(slot);
-    debugLog(`getWithoutMedia: Starting for device ${device.id} slot ${slotName}`);
-
     const lockKey = `${device.id}-${slot}-nomedia`;
     const lock =
       this.#slotLocks.get(lockKey) ??
       this.#slotLocks.set(lockKey, new Mutex()).get(lockKey)!;
 
     if (device.type !== DeviceType.CDJ) {
-      debugLog(`getWithoutMedia: Device ${device.id} is not a CDJ (type: ${device.type})`);
       return null;
     }
 
     // Check if we already have a cached database for this device/slot
-    const cacheKey = `${device.id}-${slot}`;
     const existingDb = this.#dbs.find(
       db => db.media.deviceId === device.id && db.media.slot === slot
     );
     if (existingDb) {
-      debugLog(`getWithoutMedia: Found existing cached database for ${cacheKey}`);
       return existingDb.orm;
     }
 
     try {
-      const db = await lock.runExclusive(async () => {
+      const db = await lock.runExclusive(() => {
         // Double-check cache inside lock
         const cached = this.#dbs.find(
           db => db.media.deviceId === device.id && db.media.slot === slot
         );
         if (cached) {
-          debugLog(`getWithoutMedia: Found cached database for ${cacheKey}`);
           return cached;
         }
-
-        debugLog(
-          `getWithoutMedia: No cache, attempting hydration for device ${device.id} slot ${slotName}...`
-        );
 
         // Create synthetic media info - we assume rekordbox since we're
         // attempting to fetch a rekordbox database
@@ -394,12 +351,8 @@ export class PassiveLocalDatabase {
         return this.#hydrateDatabase(device, slot, syntheticMedia);
       });
 
-      debugLog(`getWithoutMedia: Completed for device ${device.id} slot ${slotName}`);
       return db.orm;
-    } catch (error) {
-      debugLog(
-        `getWithoutMedia: Failed for device ${device.id} slot ${slotName}: ${error}`
-      );
+    } catch {
       return null;
     }
   }
@@ -411,43 +364,15 @@ export class PassiveLocalDatabase {
     const allDevices = [...this.#deviceManager.devices.values()];
     const cdjDevices = allDevices.filter(device => device.type === DeviceType.CDJ);
 
-    debugLog(`preload: ${allDevices.length} total devices, ${cdjDevices.length} CDJs`);
-
     if (cdjDevices.length === 0) {
-      debugLog('preload: No CDJ devices found, skipping');
       return;
     }
 
-    const loaders = cdjDevices.map(device => {
-      debugLog(`preload: Starting load for device ${device.id} (${device.name})`);
-      return Promise.all([
-        this.get(device.id, MediaSlot.USB)
-          .then(r => {
-            debugLog(
-              `preload: USB slot for device ${device.id} completed: ${r ? 'has data' : 'null'}`
-            );
-            return r;
-          })
-          .catch(e => {
-            debugLog(`preload: USB slot for device ${device.id} failed:`, e.message);
-            throw e;
-          }),
-        this.get(device.id, MediaSlot.SD)
-          .then(r => {
-            debugLog(
-              `preload: SD slot for device ${device.id} completed: ${r ? 'has data' : 'null'}`
-            );
-            return r;
-          })
-          .catch(e => {
-            debugLog(`preload: SD slot for device ${device.id} failed:`, e.message);
-            throw e;
-          }),
-      ]);
-    });
+    const loaders = cdjDevices.map(device =>
+      Promise.all([this.get(device.id, MediaSlot.USB), this.get(device.id, MediaSlot.SD)])
+    );
 
     await Promise.all(loaders);
-    debugLog('preload: All devices completed');
   }
 }
 
