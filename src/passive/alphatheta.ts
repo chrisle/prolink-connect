@@ -75,23 +75,71 @@ export interface AlphaThetaInterface {
  * @returns The AlphaTheta interface info, or null if not found
  */
 export function findAlphaThetaInterface(): AlphaThetaInterface | null {
-  const platform = process.platform;
+  const results = findAllAlphaThetaInterfaces();
+  return results.length > 0 ? results[0] : null;
+}
 
-  // Try USB detection first (more specific)
-  let result: AlphaThetaInterface | null = null;
+/**
+ * Find ALL network interfaces with AlphaTheta/Pioneer DJ devices.
+ * Works on macOS, Windows, and Linux.
+ *
+ * Detection methods:
+ * 1. USB: Looks for USB-connected devices (XDJ-XZ, XDJ-AZ) via system APIs
+ * 2. Ethernet: Checks ARP cache for known AlphaTheta/Pioneer MAC address prefixes
+ *
+ * Returns all detected interfaces, with USB interfaces listed first.
+ * Use this when you want to present users with a choice of interfaces,
+ * or when multiple Pro DJ Link networks are available.
+ *
+ * @example
+ * ```typescript
+ * import { findAllAlphaThetaInterfaces, bringOnlinePassive } from 'prolink-connect';
+ *
+ * const interfaces = findAllAlphaThetaInterfaces();
+ * if (interfaces.length > 0) {
+ *   console.log('Available interfaces:');
+ *   for (const iface of interfaces) {
+ *     console.log(`  ${iface.name} (${iface.connectionType}) - ${iface.ipv4 || 'no IP'}`);
+ *   }
+ *
+ *   // Let user choose or use first one
+ *   const network = await bringOnlinePassive({ iface: interfaces[0].name });
+ * }
+ * ```
+ *
+ * @returns Array of AlphaTheta interface info, empty if none found
+ */
+export function findAllAlphaThetaInterfaces(): AlphaThetaInterface[] {
+  const platform = process.platform;
+  const results: AlphaThetaInterface[] = [];
+  const seenInterfaces = new Set<string>();
+
+  // USB detection first (more specific)
+  let usbInterfaces: AlphaThetaInterface[] = [];
 
   if (platform === 'darwin') {
-    result = findAlphaThetaInterfaceMacOS();
+    usbInterfaces = findAllAlphaThetaInterfacesMacOS();
   } else if (platform === 'win32') {
-    result = findAlphaThetaInterfaceWindows();
+    usbInterfaces = findAllAlphaThetaInterfacesWindows();
   }
 
-  if (result) {
-    return result;
+  for (const iface of usbInterfaces) {
+    results.push(iface);
+    seenInterfaces.add(iface.name);
   }
 
-  // Fall back to Ethernet detection via ARP cache (works on all platforms)
-  return findAlphaThetaViaEthernet();
+  // Ethernet detection via ARP cache (works on all platforms)
+  const ethernetInterfaces = findAllAlphaThetaViaEthernet();
+
+  for (const iface of ethernetInterfaces) {
+    // Avoid duplicates if same interface found via both methods
+    if (!seenInterfaces.has(iface.name)) {
+      results.push(iface);
+      seenInterfaces.add(iface.name);
+    }
+  }
+
+  return results;
 }
 
 /**
@@ -99,6 +147,14 @@ export function findAlphaThetaInterface(): AlphaThetaInterface | null {
  * then networksetup to map them to interface names.
  */
 function findAlphaThetaInterfaceMacOS(): AlphaThetaInterface | null {
+  const results = findAllAlphaThetaInterfacesMacOS();
+  return results.length > 0 ? results[0] : null;
+}
+
+/**
+ * macOS implementation: Find ALL AlphaTheta USB interfaces.
+ */
+function findAllAlphaThetaInterfacesMacOS(): AlphaThetaInterface[] {
   try {
     // Step 1: Check if AlphaTheta USB device is connected
     const ioregOutput = execSync(
@@ -107,7 +163,7 @@ function findAlphaThetaInterfaceMacOS(): AlphaThetaInterface | null {
     );
 
     if (!ioregOutput.toLowerCase().includes('alphatheta')) {
-      return null;
+      return [];
     }
 
     // Step 2: Get all hardware ports and find USB 10/100 LAN adapters
@@ -139,11 +195,12 @@ function findAlphaThetaInterfaceMacOS(): AlphaThetaInterface | null {
     }
 
     if (usbLanInterfaces.length === 0) {
-      return null;
+      return [];
     }
 
     // Step 3: Match with active network interfaces from Node.js
     const interfaces = networkInterfaces();
+    const results: AlphaThetaInterface[] = [];
 
     for (const usbIface of usbLanInterfaces) {
       const nodeIface = interfaces[usbIface.name];
@@ -155,30 +212,30 @@ function findAlphaThetaInterfaceMacOS(): AlphaThetaInterface | null {
       const ipv4Entry = nodeIface.find(isIPv4);
 
       if (ipv4Entry) {
-        return {
+        results.push({
           name: usbIface.name,
           mac: usbIface.mac,
           ipv4: ipv4Entry.address,
           info: ipv4Entry,
           connectionType: 'usb',
-        };
-      }
-
-      // Even without IPv4, return the interface if it exists
-      const firstEntry = nodeIface[0];
-      if (firstEntry) {
-        return {
-          name: usbIface.name,
-          mac: usbIface.mac,
-          info: firstEntry,
-          connectionType: 'usb',
-        };
+        });
+      } else {
+        // Even without IPv4, include the interface if it exists
+        const firstEntry = nodeIface[0];
+        if (firstEntry) {
+          results.push({
+            name: usbIface.name,
+            mac: usbIface.mac,
+            info: firstEntry,
+            connectionType: 'usb',
+          });
+        }
       }
     }
 
-    return null;
+    return results;
   } catch {
-    return null;
+    return [];
   }
 }
 
@@ -186,6 +243,14 @@ function findAlphaThetaInterfaceMacOS(): AlphaThetaInterface | null {
  * Windows implementation: Uses PowerShell to find AlphaTheta USB network adapters.
  */
 function findAlphaThetaInterfaceWindows(): AlphaThetaInterface | null {
+  const results = findAllAlphaThetaInterfacesWindows();
+  return results.length > 0 ? results[0] : null;
+}
+
+/**
+ * Windows implementation: Find ALL AlphaTheta USB interfaces.
+ */
+function findAllAlphaThetaInterfacesWindows(): AlphaThetaInterface[] {
   try {
     // Use PowerShell to find USB network adapters from AlphaTheta
     // PnP devices with AlphaTheta in the manufacturer or description
@@ -203,60 +268,70 @@ function findAlphaThetaInterfaceWindows(): AlphaThetaInterface | null {
     });
 
     if (!output.trim()) {
-      return null;
+      return [];
     }
 
     const adapters = JSON.parse(output);
     const adapterList = Array.isArray(adapters) ? adapters : [adapters];
 
     if (adapterList.length === 0) {
-      return null;
+      return [];
     }
 
-    const adapter = adapterList[0];
     const interfaces = networkInterfaces();
+    const results: AlphaThetaInterface[] = [];
 
-    // Windows interface names in Node.js might differ from PowerShell names
-    // Try to match by MAC address
-    const targetMac = adapter.MacAddress?.replace(/-/g, ':').toLowerCase();
+    for (const adapter of adapterList) {
+      // Windows interface names in Node.js might differ from PowerShell names
+      // Try to match by MAC address
+      const targetMac = adapter.MacAddress?.replace(/-/g, ':').toLowerCase();
+      let found = false;
 
-    for (const [ifaceName, ifaceInfos] of Object.entries(interfaces)) {
-      if (!ifaceInfos) {
-        continue;
+      for (const [ifaceName, ifaceInfos] of Object.entries(interfaces)) {
+        if (!ifaceInfos) {
+          continue;
+        }
+
+        for (const info of ifaceInfos) {
+          if (info.mac.toLowerCase() === targetMac) {
+            const ipv4Entry = ifaceInfos.find(isIPv4);
+
+            results.push({
+              name: ifaceName,
+              mac: info.mac,
+              ipv4: ipv4Entry?.address,
+              info: ipv4Entry || info,
+              connectionType: 'usb',
+            });
+            found = true;
+            break;
+          }
+        }
+        if (found) {
+          break;
+        }
       }
 
-      for (const info of ifaceInfos) {
-        if (info.mac.toLowerCase() === targetMac) {
-          const ipv4Entry = ifaceInfos.find(isIPv4);
+      // Fallback: try matching by name directly
+      if (!found) {
+        const nodeIface = interfaces[adapter.Name];
+        if (nodeIface) {
+          const ipv4Entry = nodeIface.find(isIPv4);
 
-          return {
-            name: ifaceName,
-            mac: info.mac,
+          results.push({
+            name: adapter.Name,
+            mac: adapter.MacAddress,
             ipv4: ipv4Entry?.address,
-            info: ipv4Entry || info,
+            info: ipv4Entry || nodeIface[0],
             connectionType: 'usb',
-          };
+          });
         }
       }
     }
 
-    // Fallback: try matching by name directly
-    const nodeIface = interfaces[adapter.Name];
-    if (nodeIface) {
-      const ipv4Entry = nodeIface.find(isIPv4);
-
-      return {
-        name: adapter.Name,
-        mac: adapter.MacAddress,
-        ipv4: ipv4Entry?.address,
-        info: ipv4Entry || nodeIface[0],
-        connectionType: 'usb',
-      };
-    }
-
-    return null;
+    return results;
   } catch {
-    return null;
+    return [];
   }
 }
 
@@ -385,15 +460,25 @@ function getAlphaThetaArpEntries(): Map<string, Array<{ip: string; mac: string}>
  * for known MAC address prefixes.
  */
 function findAlphaThetaViaEthernet(): AlphaThetaInterface | null {
+  const results = findAllAlphaThetaViaEthernet();
+  return results.length > 0 ? results[0] : null;
+}
+
+/**
+ * Find ALL AlphaTheta devices connected via Ethernet by checking the ARP cache
+ * for known MAC address prefixes.
+ */
+function findAllAlphaThetaViaEthernet(): AlphaThetaInterface[] {
   const alphaThetaEntries = getAlphaThetaArpEntries();
 
   if (alphaThetaEntries.size === 0) {
-    return null;
+    return [];
   }
 
   const interfaces = networkInterfaces();
+  const results: AlphaThetaInterface[] = [];
 
-  // Find the first interface that has AlphaTheta devices
+  // Find all interfaces that have AlphaTheta devices
   for (const [arpIfaceName, devices] of alphaThetaEntries) {
     // On Windows, ARP uses IP addresses as interface identifiers
     // We need to find the matching Node.js interface
@@ -428,15 +513,15 @@ function findAlphaThetaViaEthernet(): AlphaThetaInterface | null {
       continue;
     }
 
-    return {
+    results.push({
       name: nodeIfaceName,
       mac: ipv4Entry.mac,
       ipv4: ipv4Entry.address,
       info: ipv4Entry,
       connectionType: 'ethernet',
       deviceIps: devices.map(d => d.ip),
-    };
+    });
   }
 
-  return null;
+  return results;
 }
