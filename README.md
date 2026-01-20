@@ -21,20 +21,30 @@ part of [Prolink Tools](https://prolink.tools/).
 
 Alternative implementations of the Prolink protocol: [Java](https://github.com/Deep-Symmetry/beat-link), [golang](https://github.com/evanpurkhiser/prolink-go).
 
-Thank you to [@brunchboy](https://github.com/brunchboy) for his work on
-[dysentery](https://github.com/brunchboy/dysentery).
-
 ## Features
 
-- **Written in Typescript** - Accurate typings making implementation a breeze.
-  Autocompete your DJ tools to completion.
+- **Support for AlphaTheta Opus Quad, XDJ-RX3, XDJ-RX2, XDJ-RX, and XDJ-XZ** *(new)* -
+  Passive mode monitoring via pcap-based packet capture for all-in-one controllers
+  where traditional virtual CDJ connection isn't possible.
+  See [ALL_IN_ONE_UNITS.md](docs/ALL_IN_ONE_UNITS.md) for details.
 
-- **CDJ Status** - Receive Player state details for each CDJ on the network.
-  The status is reported as a [`CDJStatus.State`](https://connect.prolink.tools/modules/_src_status_types_.html).
+- **OneLibrary Support** *(new)* - Full support for rekordbox 7.x's new OneLibrary
+  format (exportLibrary.db) with SQLCipher encryption, including tracks, playlists,
+  cues, hot cue banks, myTags, and history.
 
-- **Metadata Database** - Access metadata of currently the currently playing
-  (or not!) tracks stored in the connected Rekordbox formatted USB / SD
-  device, or via Rekordbox link.
+- **6-Channel On-Air Support** - Full support for 6-channel configurations with
+  CDJ-3000, CDJ-3000x, and DJM-V10 mixers.
+  See [ON_AIR_CHANNELS.md](docs/ON_AIR_CHANNELS.md) for details.
+
+- **Artwork Extraction via NFS** - Extract album artwork directly from audio files
+  on connected media via the NFS protocol.
+
+- **Configurable Virtual CDJ Name** - Customize the name that appears on the network
+  for your virtual CDJ device.
+
+- **Optional Full DJ Link Startup Protocol** - Enable the complete startup handshake
+  sequence for better compatibility with certain device configurations.
+  See [FULL_STARTUP.md](docs/FULL_STARTUP.md) for details.
 
 - **Extended ANLZ Support** - Full support for rekordbox analysis files including:
   - Extended cues with RGB colors and comments (PCO2)
@@ -46,6 +56,19 @@ Thank you to [@brunchboy](https://github.com/brunchboy) for his work on
   - Absolute position tracking (30ms updates)
   - Compatible startup packets for devices on channels 5-6
   - See [ABSOLUTE_POSITION.md](docs/ABSOLUTE_POSITION.md) for details
+
+- **Written in Typescript** - Accurate typings making implementation a breeze.
+  Autocompete your DJ tools to completion.
+
+- **CDJ Status** - Receive Player state details for each CDJ on the network.
+  The status is reported as a [`CDJStatus.State`](https://connect.prolink.tools/modules/_src_status_types_.html).
+
+- **Metadata Database** - Access metadata of currently the currently playing
+  (or not!) tracks stored in the connected Rekordbox formatted USB / SD
+  device, or via Rekordbox link.
+
+- **Opt-in Telemetry** - Optional error reporting via Sentry to help improve the
+  library (disabled by default, configurable via environment variable).
 
 ## Library usage
 
@@ -133,3 +156,11 @@ async function main() {
   }
 }
 ```
+
+## Thanks To
+
+- [@evanpurkhiser](https://github.com/evanpurkhiser) - Original author of prolink-connect and [Prolink Tools](https://prolink.tools/)
+- [@brunchboy](https://github.com/brunchboy) - For his incredible work on [dysentery](https://github.com/brunchboy/dysentery) reverse engineering the Pro DJ Link protocol and [beat-link](https://github.com/Deep-Symmetry/beat-link) Java implementation
+- [Deep Symmetry](https://github.com/Deep-Symmetry) - For [crate-digger](https://github.com/Deep-Symmetry/crate-digger) and maintaining comprehensive Pro DJ Link protocol documentation
+- [@henrybetts](https://github.com/henrybetts) and [@flesniak](https://github.com/flesniak) - For reverse-engineering the rekordbox database format
+- [@GreyCat](https://github.com/GreyCat) - For Kaitai Struct expertise and guidance
