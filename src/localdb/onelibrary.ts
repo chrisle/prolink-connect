@@ -27,6 +27,7 @@ import {
 } from 'src/entities';
 import {CueAndLoop, CueColor, HotcueButton} from 'src/types';
 
+import {DatabaseAdapter, DatabaseType} from './database-adapter';
 import {
   ArtistRow,
   CategoryRow,
@@ -154,7 +155,9 @@ export function openOneLibraryDb(dbPath: string): Database.Database {
  * Adapter for OneLibrary database that matches the ORM interface.
  * Queries the SQLite file directly instead of hydrating into memory.
  */
-export class OneLibraryAdapter {
+export class OneLibraryAdapter implements DatabaseAdapter {
+  readonly type: DatabaseType = 'oneLibrary';
+
   #db: Database.Database;
   #stmtCache = new Map<string, Database.Statement>();
 
@@ -283,7 +286,11 @@ export class OneLibraryAdapter {
       autoloadHotcues: !!row.isHotCueAutoLoadOn,
       kuvoPublic: !!row.isKuvoDeliverStatusOn,
       fileSize: row.fileSize ?? undefined,
-      analyzePath: row.analysisDataFilePath ?? undefined,
+      // Normalize analyzePath by trimming the .DAT extension (same as rekordbox.ts)
+      // loadAnlz() will append the appropriate extension (.DAT or .EXT) when loading
+      analyzePath: row.analysisDataFilePath
+        ? row.analysisDataFilePath.substring(0, row.analysisDataFilePath.length - 4)
+        : undefined,
       releaseDate: row.releaseDate ?? undefined,
       dateAdded: row.dateAdded ? new Date(row.dateAdded) : undefined,
 

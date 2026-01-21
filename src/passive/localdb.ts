@@ -3,7 +3,12 @@ import StrictEventEmitter from 'strict-event-emitter-types';
 
 import {createHash} from 'crypto';
 import {EventEmitter} from 'events';
+import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
 
+import {DatabaseAdapter, DatabasePreference} from 'src/localdb/database-adapter';
+import {OneLibraryAdapter} from 'src/localdb/onelibrary';
 import {MetadataORM} from 'src/localdb/orm';
 import {hydrateDatabase, HydrationProgress} from 'src/localdb/rekordbox';
 import {fetchFile, FetchProgress} from 'src/nfs';
@@ -65,7 +70,8 @@ type Emitter = StrictEventEmitter<EventEmitter, DatabaseEvents>;
 interface DatabaseItem {
   id: string;
   media: MediaSlotInfo;
-  orm: MetadataORM;
+  adapter: DatabaseAdapter;
+  tempFile?: string;
 }
 
 /**
@@ -107,13 +113,36 @@ export class PassiveLocalDatabase {
    * Cache of media slot info received from broadcast packets
    */
   #mediaCache = new Map<string, MediaSlotInfo>();
+  /**
+   * Database format preference
+   */
+  #preference: DatabasePreference = 'auto';
 
-  constructor(deviceManager: PassiveDeviceManager, statusEmitter: PassiveStatusEmitter) {
+  constructor(
+    deviceManager: PassiveDeviceManager,
+    statusEmitter: PassiveStatusEmitter,
+    preference: DatabasePreference = 'auto'
+  ) {
     this.#deviceManager = deviceManager;
     this.#statusEmitter = statusEmitter;
+    this.#preference = preference;
 
     deviceManager.on('disconnected', this.#handleDeviceRemoved);
     statusEmitter.on('mediaSlot', this.#handleMediaSlot);
+  }
+
+  /**
+   * Get the current database preference
+   */
+  get preference(): DatabasePreference {
+    return this.#preference;
+  }
+
+  /**
+   * Set the database preference. Only affects newly loaded databases.
+   */
+  set preference(value: DatabasePreference) {
+    this.#preference = value;
   }
 
   // Bind public event emitter interface
@@ -151,9 +180,16 @@ export class PassiveLocalDatabase {
     this.#deviceManager.off('disconnected', this.#handleDeviceRemoved);
     this.#statusEmitter.off('mediaSlot', this.#handleMediaSlot);
 
-    // Close all database connections
+    // Close all database connections and clean up temp files
     for (const db of this.#dbs) {
-      db.orm.close();
+      db.adapter.close();
+      if (db.tempFile) {
+        try {
+          fs.unlinkSync(db.tempFile);
+        } catch {
+          // Ignore cleanup errors
+        }
+      }
     }
     this.#dbs = [];
     this.#mediaCache.clear();
@@ -165,7 +201,17 @@ export class PassiveLocalDatabase {
   };
 
   #handleDeviceRemoved = (device: Device) => {
-    this.#dbs.find(db => db.media.deviceId === device.id)?.orm.close();
+    const db = this.#dbs.find(db => db.media.deviceId === device.id);
+    if (db) {
+      db.adapter.close();
+      if (db.tempFile) {
+        try {
+          fs.unlinkSync(db.tempFile);
+        } catch {
+          // Ignore cleanup errors
+        }
+      }
+    }
     this.#dbs = this.#dbs.filter(db => db.media.deviceId !== device.id);
 
     // Clear cached media for this device
@@ -176,52 +222,124 @@ export class PassiveLocalDatabase {
     }
   };
 
-  #hydrateDatabase = async (device: Device, slot: DatabaseSlot, media: MediaSlotInfo) => {
-    const tx = Telemetry.startTransaction({name: 'hydrateDatabase'});
+  /**
+   * Helper to fetch a file from device, trying both dotted and non-dotted paths
+   */
+  #fetchFileWithFallback = async (
+    device: Device,
+    slot: DatabaseSlot,
+    basePath: string,
+    tx: Telemetry.TelemetrySpan
+  ): Promise<Buffer> => {
+    const attemptOrder =
+      process.platform === 'win32' ? [basePath, `.${basePath}`] : [`.${basePath}`, basePath];
 
-    tx.setTag('slot', getSlotName(media.slot));
-    tx.setData('numTracks', media.trackCount.toString());
+    try {
+      return await fetchFile({
+        device,
+        slot,
+        path: attemptOrder[0],
+        span: tx,
+        onProgress: progress => this.#emitter.emit('fetchProgress', {device, slot, progress}),
+      });
+    } catch {
+      return await fetchFile({
+        device,
+        slot,
+        path: attemptOrder[1],
+        span: tx,
+        onProgress: progress => this.#emitter.emit('fetchProgress', {device, slot, progress}),
+      });
+    }
+  };
+
+  /**
+   * Try to load OneLibrary database (exportLibrary.db).
+   */
+  #tryLoadOneLibrary = async (
+    device: Device,
+    slot: DatabaseSlot,
+    tx: Telemetry.TelemetrySpan
+  ): Promise<{adapter: OneLibraryAdapter; tempFile: string} | null> => {
+    const oneLibraryPath = 'PIONEER/rekordbox/exportLibrary.db';
+
+    try {
+      const dbData = await this.#fetchFileWithFallback(device, slot, oneLibraryPath, tx);
+
+      const tempDir = os.tmpdir();
+      const tempFile = path.join(tempDir, `prolink-onelibrary-${device.id}-${slot}-${Date.now()}.db`);
+      fs.writeFileSync(tempFile, dbData);
+
+      const adapter = new OneLibraryAdapter(tempFile);
+      return {adapter, tempFile};
+    } catch {
+      return null;
+    }
+  };
+
+  /**
+   * Load PDB database (export.pdb) and hydrate into MetadataORM.
+   */
+  #loadPdbDatabase = async (
+    device: Device,
+    slot: DatabaseSlot,
+    tx: Telemetry.TelemetrySpan
+  ): Promise<MetadataORM> => {
+    const pdbPath = 'PIONEER/rekordbox/export.pdb';
+    const pdbData = await this.#fetchFileWithFallback(device, slot, pdbPath, tx);
 
     const dbCreateTx = tx.startChild({op: 'setupDatabase'});
     const orm = new MetadataORM();
     dbCreateTx.finish();
 
-    let pdbData = Buffer.alloc(0);
-
-    const fetchPdbData = async (path: string) =>
-      (pdbData = await fetchFile({
-        device,
-        slot,
-        path,
-        span: tx,
-        onProgress: progress =>
-          this.#emitter.emit('fetchProgress', {device, slot, progress}),
-      }));
-
-    // Rekordbox exports to both the `.PIONEER` and `PIONEER` folder, depending
-    // on the media devices filesystem (HFS, FAT32, etc).
-    const path = 'PIONEER/rekordbox/export.pdb';
-
-    // Attempt to be semi-smart and first try the path correlating to the OS
-    const attemptOrder =
-      process.platform === 'win32' ? [path, `.${path}`] : [`.${path}`, path];
-
-    try {
-      await fetchPdbData(attemptOrder[0]);
-    } catch {
-      await fetchPdbData(attemptOrder[1]);
-    }
-
     await hydrateDatabase({
       orm,
       pdbData,
       span: tx,
-      onProgress: progress =>
-        this.#emitter.emit('hydrationProgress', {device, slot, progress}),
+      onProgress: progress => this.#emitter.emit('hydrationProgress', {device, slot, progress}),
     });
+
+    return orm;
+  };
+
+  #hydrateDatabase = async (device: Device, slot: DatabaseSlot, media: MediaSlotInfo) => {
+    const tx = Telemetry.startTransaction({name: 'hydrateDatabase'});
+
+    tx.setTag('slot', getSlotName(media.slot));
+    tx.setData('numTracks', media.trackCount.toString());
+    tx.setTag('preference', this.#preference);
+
+    let adapter: DatabaseAdapter;
+    let tempFile: string | undefined;
+
+    if (this.#preference === 'pdb') {
+      adapter = await this.#loadPdbDatabase(device, slot, tx);
+      tx.setTag('dbType', 'pdb');
+    } else if (this.#preference === 'oneLibrary') {
+      const oneLibraryResult = await this.#tryLoadOneLibrary(device, slot, tx);
+      if (!oneLibraryResult) {
+        throw new Error('OneLibrary database not found and preference is set to oneLibrary only');
+      }
+      adapter = oneLibraryResult.adapter;
+      tempFile = oneLibraryResult.tempFile;
+      tx.setTag('dbType', 'oneLibrary');
+    } else {
+      // Auto: Try OneLibrary first, fall back to PDB
+      const oneLibraryResult = await this.#tryLoadOneLibrary(device, slot, tx);
+
+      if (oneLibraryResult) {
+        adapter = oneLibraryResult.adapter;
+        tempFile = oneLibraryResult.tempFile;
+        tx.setTag('dbType', 'oneLibrary');
+      } else {
+        adapter = await this.#loadPdbDatabase(device, slot, tx);
+        tx.setTag('dbType', 'pdb');
+      }
+    }
+
     this.#emitter.emit('hydrationDone', {device, slot});
 
-    const db = {orm, media, id: getMediaId(media)};
+    const db: DatabaseItem = {adapter, media, id: getMediaId(media), tempFile};
     this.#dbs.push(db);
 
     tx.finish();
@@ -230,8 +348,8 @@ export class PassiveLocalDatabase {
   };
 
   /**
-   * Gets the sqlite ORM service for a database hydrated with the media
-   * metadata for the provided device slot, using cached media info.
+   * Gets the database adapter for the media metadata in the provided device slot,
+   * using cached media info.
    *
    * This method uses cached media slot info that was received from
    * broadcast packets. If no media info is cached for this slot,
@@ -240,7 +358,7 @@ export class PassiveLocalDatabase {
    *
    * @returns null if no rekordbox media present or fetch fails
    */
-  get(deviceId: DeviceID, slot: DatabaseSlot) {
+  get(deviceId: DeviceID, slot: DatabaseSlot): Promise<DatabaseAdapter | null> {
     const cachedMedia = this.getCachedMedia(deviceId, slot);
     const device = this.#deviceManager.devices.get(deviceId);
 
@@ -259,15 +377,18 @@ export class PassiveLocalDatabase {
   }
 
   /**
-   * Gets the sqlite ORM service for a database hydrated with the media
-   * metadata using provided media slot info.
+   * Gets the database adapter for the media metadata using provided media slot info.
    *
    * Use this method when you have media slot info from another source
    * (e.g., parsed from status packets or provided manually).
    *
    * @returns null if no rekordbox media present
    */
-  async getWithMedia(device: Device, slot: DatabaseSlot, media: MediaSlotInfo) {
+  async getWithMedia(
+    device: Device,
+    slot: DatabaseSlot,
+    media: MediaSlotInfo
+  ): Promise<DatabaseAdapter | null> {
     const lockKey = `${device.id}-${slot}`;
     const lock =
       this.#slotLocks.get(lockKey) ??
@@ -291,7 +412,7 @@ export class PassiveLocalDatabase {
       return this.#hydrateDatabase(device, slot, media);
     });
 
-    return db.orm;
+    return db.adapter;
   }
 
   /**
@@ -319,7 +440,7 @@ export class PassiveLocalDatabase {
       db => db.media.deviceId === device.id && db.media.slot === slot
     );
     if (existingDb) {
-      return existingDb.orm;
+      return existingDb.adapter;
     }
 
     try {
@@ -351,7 +472,7 @@ export class PassiveLocalDatabase {
         return this.#hydrateDatabase(device, slot, syntheticMedia);
       });
 
-      return db.orm;
+      return db.adapter;
     } catch {
       return null;
     }

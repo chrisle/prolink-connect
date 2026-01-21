@@ -3,6 +3,7 @@ import {camelCase, mapKeys, mapValues, partition, snakeCase} from 'lodash';
 
 import {EntityFK, Playlist, PlaylistEntry, Track} from 'src/entities';
 
+import {DatabaseAdapter, DatabaseType} from './database-adapter';
 import {generateSchema} from './schema';
 
 /**
@@ -46,7 +47,9 @@ const trackRelationTableMap: Record<string, string> = {
  *
  * May be used to populate a metadata database and query objects.
  */
-export class MetadataORM {
+export class MetadataORM implements DatabaseAdapter {
+  readonly type: DatabaseType = 'pdb';
+
   #conn: sqlite3.Database;
   #stmtCache = new Map<string, sqlite3.Statement>();
   #inTransaction = false;
@@ -117,10 +120,14 @@ export class MetadataORM {
   /**
    * Locate a track by ID in the database
    */
-  findTrack(id: number): Track {
-    const row: Record<string, any> = this.#conn
+  findTrack(id: number): Track | null {
+    const row: Record<string, any> | undefined = this.#conn
       .prepare<any, any>(`select * from ${Table.Track} where id = ?`)
       .get(id);
+
+    if (!row) {
+      return null;
+    }
 
     // Map row columns to camel case compatibility
     const trackRow = mapKeys(row, (_, k) => camelCase(k)) as Track<EntityFK.WithFKs>;

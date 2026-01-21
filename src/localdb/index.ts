@@ -3,6 +3,9 @@ import StrictEventEmitter from 'strict-event-emitter-types';
 
 import {createHash} from 'crypto';
 import {EventEmitter} from 'events';
+import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
 
 import DeviceManager from 'src/devices';
 import {fetchFile, FetchProgress} from 'src/nfs';
@@ -18,6 +21,8 @@ import {
 import {getSlotName} from 'src/utils';
 import * as Telemetry from 'src/utils/telemetry';
 
+import {DatabaseAdapter, DatabasePreference, DatabaseType} from './database-adapter';
+import {OneLibraryAdapter} from './onelibrary';
 import {MetadataORM} from './orm';
 import {hydrateDatabase, HydrationProgress} from './rekordbox';
 
@@ -88,9 +93,13 @@ interface DatabaseItem {
    */
   media: MediaSlotInfo;
   /**
-   * The MetadataORM service instance for the active connection
+   * The database adapter instance (MetadataORM or OneLibraryAdapter)
    */
-  orm: MetadataORM;
+  adapter: DatabaseAdapter;
+  /**
+   * Path to temp file (for OneLibrary), needs cleanup on close
+   */
+  tempFile?: string;
 }
 
 /**
@@ -136,17 +145,37 @@ class LocalDatabase {
    * The current available databases
    */
   #dbs: DatabaseItem[] = [];
+  /**
+   * Database format preference
+   */
+  #preference: DatabasePreference = 'auto';
 
   constructor(
     hostDevice: Device,
     deviceManager: DeviceManager,
-    statusEmitter: StatusEmitter
+    statusEmitter: StatusEmitter,
+    preference: DatabasePreference = 'auto'
   ) {
     this.#hostDevice = hostDevice;
     this.#deviceManager = deviceManager;
     this.#statusEmitter = statusEmitter;
+    this.#preference = preference;
 
     deviceManager.on('disconnected', this.#handleDeviceRemoved);
+  }
+
+  /**
+   * Get the current database preference
+   */
+  get preference(): DatabasePreference {
+    return this.#preference;
+  }
+
+  /**
+   * Set the database preference. Only affects newly loaded databases.
+   */
+  set preference(value: DatabasePreference) {
+    this.#preference = value;
   }
 
   // Bind public event emitter interface
@@ -166,62 +195,151 @@ class LocalDatabase {
    * device is removed.
    */
   #handleDeviceRemoved = (device: Device) => {
-    this.#dbs.find(db => db.media.deviceId === device.id)?.orm.close();
+    const db = this.#dbs.find(db => db.media.deviceId === device.id);
+    if (db) {
+      db.adapter.close();
+      // Clean up temp file if it exists (OneLibrary databases)
+      if (db.tempFile) {
+        try {
+          fs.unlinkSync(db.tempFile);
+        } catch {
+          // Ignore cleanup errors
+        }
+      }
+    }
     this.#dbs = this.#dbs.filter(db => db.media.deviceId !== device.id);
   };
 
   /**
-   * Downloads and hydrates a new in-memory sqlite database
+   * Helper to fetch a file from device, trying both dotted and non-dotted paths
+   */
+  #fetchFileWithFallback = async (
+    device: Device,
+    slot: DatabaseSlot,
+    basePath: string,
+    tx: Telemetry.TelemetrySpan
+  ): Promise<Buffer> => {
+    const attemptOrder =
+      process.platform === 'win32' ? [basePath, `.${basePath}`] : [`.${basePath}`, basePath];
+
+    try {
+      return await fetchFile({
+        device,
+        slot,
+        path: attemptOrder[0],
+        span: tx,
+        onProgress: progress => this.#emitter.emit('fetchProgress', {device, slot, progress}),
+      });
+    } catch {
+      return await fetchFile({
+        device,
+        slot,
+        path: attemptOrder[1],
+        span: tx,
+        onProgress: progress => this.#emitter.emit('fetchProgress', {device, slot, progress}),
+      });
+    }
+  };
+
+  /**
+   * Try to load OneLibrary database (exportLibrary.db).
+   * Returns the adapter and temp file path, or null if not available.
+   */
+  #tryLoadOneLibrary = async (
+    device: Device,
+    slot: DatabaseSlot,
+    tx: Telemetry.TelemetrySpan
+  ): Promise<{adapter: OneLibraryAdapter; tempFile: string} | null> => {
+    const oneLibraryPath = 'PIONEER/rekordbox/exportLibrary.db';
+
+    try {
+      const dbData = await this.#fetchFileWithFallback(device, slot, oneLibraryPath, tx);
+
+      // Write to temp file (OneLibrary requires file path for SQLCipher)
+      const tempDir = os.tmpdir();
+      const tempFile = path.join(tempDir, `prolink-onelibrary-${device.id}-${slot}-${Date.now()}.db`);
+      fs.writeFileSync(tempFile, dbData);
+
+      const adapter = new OneLibraryAdapter(tempFile);
+      return {adapter, tempFile};
+    } catch {
+      // OneLibrary not available
+      return null;
+    }
+  };
+
+  /**
+   * Load PDB database (export.pdb) and hydrate into MetadataORM.
+   */
+  #loadPdbDatabase = async (
+    device: Device,
+    slot: DatabaseSlot,
+    tx: Telemetry.TelemetrySpan
+  ): Promise<MetadataORM> => {
+    const pdbPath = 'PIONEER/rekordbox/export.pdb';
+    const pdbData = await this.#fetchFileWithFallback(device, slot, pdbPath, tx);
+
+    const dbCreateTx = tx.startChild({op: 'setupDatabase'});
+    const orm = new MetadataORM();
+    dbCreateTx.finish();
+
+    await hydrateDatabase({
+      orm,
+      pdbData,
+      span: tx,
+      onProgress: progress => this.#emitter.emit('hydrationProgress', {device, slot, progress}),
+    });
+
+    return orm;
+  };
+
+  /**
+   * Downloads and loads a database from a device.
+   * Respects the database preference setting:
+   * - 'auto': Try OneLibrary first, fall back to PDB
+   * - 'oneLibrary': Only use OneLibrary
+   * - 'pdb': Only use PDB
    */
   #hydrateDatabase = async (device: Device, slot: DatabaseSlot, media: MediaSlotInfo) => {
     const tx = Telemetry.startTransaction({name: 'hydrateDatabase'});
 
     tx.setTag('slot', getSlotName(media.slot));
     tx.setData('numTracks', media.trackCount.toString());
+    tx.setTag('preference', this.#preference);
 
-    const dbCreateTx = tx.startChild({op: 'setupDatabase'});
-    const orm = new MetadataORM();
-    dbCreateTx.finish();
+    let adapter: DatabaseAdapter;
+    let tempFile: string | undefined;
 
-    let pdbData = Buffer.alloc(0);
+    if (this.#preference === 'pdb') {
+      // PDB only
+      adapter = await this.#loadPdbDatabase(device, slot, tx);
+      tx.setTag('dbType', 'pdb');
+    } else if (this.#preference === 'oneLibrary') {
+      // OneLibrary only
+      const oneLibraryResult = await this.#tryLoadOneLibrary(device, slot, tx);
+      if (!oneLibraryResult) {
+        throw new Error('OneLibrary database not found and preference is set to oneLibrary only');
+      }
+      adapter = oneLibraryResult.adapter;
+      tempFile = oneLibraryResult.tempFile;
+      tx.setTag('dbType', 'oneLibrary');
+    } else {
+      // Auto: Try OneLibrary first, fall back to PDB
+      const oneLibraryResult = await this.#tryLoadOneLibrary(device, slot, tx);
 
-    const fetchPdbData = async (path: string) =>
-      (pdbData = await fetchFile({
-        device,
-        slot,
-        path,
-        span: tx,
-        onProgress: progress =>
-          this.#emitter.emit('fetchProgress', {device, slot, progress}),
-      }));
-
-    // Rekordbox exports to both the `.PIONEER` and `PIONEER` folder, depending
-    // on the media devices filesystem (HFS, FAT32, etc). Unfortunately there's no
-    // way for us to know the type of filesystem, so we have to try both
-    const path = 'PIONEER/rekordbox/export.pdb';
-
-    // Attempt to be semi-smart and first try the path coorelating to the OS
-    // they're running this on. The assumption is they may have used the same
-    // machine to export their tracks on.
-    const attemptOrder =
-      process.platform === 'win32' ? [path, `.${path}`] : [`.${path}`, path];
-
-    try {
-      await fetchPdbData(attemptOrder[0]);
-    } catch {
-      await fetchPdbData(attemptOrder[1]);
+      if (oneLibraryResult) {
+        adapter = oneLibraryResult.adapter;
+        tempFile = oneLibraryResult.tempFile;
+        tx.setTag('dbType', 'oneLibrary');
+      } else {
+        adapter = await this.#loadPdbDatabase(device, slot, tx);
+        tx.setTag('dbType', 'pdb');
+      }
     }
 
-    await hydrateDatabase({
-      orm,
-      pdbData,
-      span: tx,
-      onProgress: progress =>
-        this.#emitter.emit('hydrationProgress', {device, slot, progress}),
-    });
     this.#emitter.emit('hydrationDone', {device, slot});
 
-    const db = {orm, media, id: getMediaId(media)};
+    const db: DatabaseItem = {adapter, media, id: getMediaId(media), tempFile};
     this.#dbs.push(db);
 
     tx.finish();
@@ -230,15 +348,14 @@ class LocalDatabase {
   };
 
   /**
-   * Gets the sqlite ORM service for to a database hydrated with the media
-   * metadata for the provided device slot.
+   * Gets the database adapter for the media metadata in the provided device slot.
    *
-   * If the database has not already been hydrated this will first hydrate the
+   * If the database has not already been loaded this will first fetch and load the
    * database, which may take some time depending on the size of the database.
    *
    * @returns null if no rekordbox media present
    */
-  async get(deviceId: DeviceID, slot: DatabaseSlot) {
+  async get(deviceId: DeviceID, slot: DatabaseSlot): Promise<DatabaseAdapter | null> {
     const lockKey = `${deviceId}-${slot}`;
     const lock =
       this.#slotLocks.get(lockKey) ??
@@ -281,7 +398,18 @@ class LocalDatabase {
       return this.#hydrateDatabase(device, slot, media);
     });
 
-    return db.orm;
+    return db.adapter;
+  }
+
+  /**
+   * Get the database type for an already-loaded device slot.
+   * Returns null if no database is loaded for that device/slot.
+   */
+  getDatabaseType(deviceId: DeviceID, slot: DatabaseSlot): DatabaseType | null {
+    const db = this.#dbs.find(
+      db => db.media.deviceId === deviceId && db.media.slot === slot
+    );
+    return db?.adapter.type ?? null;
   }
 
   /**

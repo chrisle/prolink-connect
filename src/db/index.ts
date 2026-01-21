@@ -1,6 +1,7 @@
 import DeviceManager from 'src/devices';
 import {Track} from 'src/entities';
 import LocalDatabase from 'src/localdb';
+import {DatabaseType} from 'src/localdb/database-adapter';
 import RemoteDatabase from 'src/remotedb';
 import {
   Device,
@@ -83,6 +84,17 @@ class Database {
    */
   get cdjSupportsRemotedb() {
     return this.#hostDevice.id > 0 && this.#hostDevice.id < 7;
+  }
+
+  /**
+   * Get the database type (oneLibrary or pdb) for a loaded device slot.
+   * Returns null if the slot uses remote database or no database is loaded.
+   */
+  getDatabaseType(
+    deviceId: number,
+    slot: MediaSlot.USB | MediaSlot.SD
+  ): DatabaseType | null {
+    return this.#localDatabase.getDatabaseType(deviceId, slot);
   }
 
   /**

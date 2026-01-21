@@ -15,5 +15,14 @@ export {
 } from './artwork';
 export type {ExtractedArtwork, FileReader as ArtworkFileReader} from './artwork';
 
+// Database adapters
+export type {
+  DatabaseAdapter,
+  DatabasePreference,
+  DatabaseType,
+  PlaylistQueryResult,
+} from './localdb/database-adapter';
+export {OneLibraryAdapter} from './localdb/onelibrary';
+
 // Types are exported last to avoid overwriting values with type-only exports
 export * from './types';

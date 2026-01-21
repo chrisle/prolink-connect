@@ -7,6 +7,7 @@ import Control from 'src/control';
 import Database from 'src/db';
 import DeviceManager from 'src/devices';
 import LocalDatabase from 'src/localdb';
+import {DatabasePreference} from 'src/localdb/database-adapter';
 import {MixstatusProcessor} from 'src/mixstatus';
 import RemoteDatabase from 'src/remotedb';
 import StatusEmitter from 'src/status';
@@ -63,6 +64,16 @@ export interface NetworkConfig {
    * hardware to ensure proper device discovery and network stability.
    */
   fullStartup?: boolean;
+  /**
+   * Database format preference for loading rekordbox databases.
+   *
+   * - 'auto': Try OneLibrary first (rekordbox 7.x+), fall back to PDB (rekordbox 6.x)
+   * - 'oneLibrary': Only use OneLibrary format (exportLibrary.db)
+   * - 'pdb': Only use PDB format (export.pdb)
+   *
+   * @default 'auto'
+   */
+  databasePreference?: DatabasePreference;
 }
 
 interface ConnectionService {
@@ -272,7 +283,12 @@ export class ProlinkNetwork {
 
     // Create remote and local databases
     const remotedb = new RemoteDatabase(this.#deviceManager, vcdj);
-    const localdb = new LocalDatabase(vcdj, this.#deviceManager, this.#statusEmitter);
+    const localdb = new LocalDatabase(
+      vcdj,
+      this.#deviceManager,
+      this.#statusEmitter,
+      this.#config.databasePreference ?? 'auto'
+    );
 
     // Create unified database
     const database = new Database(vcdj, localdb, remotedb, this.#deviceManager);

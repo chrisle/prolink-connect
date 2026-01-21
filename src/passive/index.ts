@@ -1,5 +1,6 @@
 import {type NetworkInterfaceInfo, networkInterfaces} from 'os';
 
+import {DatabasePreference} from 'src/localdb/database-adapter';
 import {MixstatusProcessor} from 'src/mixstatus';
 
 import {PassiveDeviceManager} from './devices';
@@ -37,6 +38,16 @@ export interface PassiveNetworkConfig {
    * @default 10000
    */
   deviceTimeout?: number;
+  /**
+   * Database format preference for loading rekordbox databases.
+   *
+   * - 'auto': Try OneLibrary first (rekordbox 7.x+), fall back to PDB (rekordbox 6.x)
+   * - 'oneLibrary': Only use OneLibrary format (exportLibrary.db)
+   * - 'pdb': Only use PDB format (export.pdb)
+   *
+   * @default 'auto'
+   */
+  databasePreference?: DatabasePreference;
 }
 
 /**
@@ -79,7 +90,11 @@ export class PassiveProlinkNetwork {
 
     this.#statusEmitter = new PassiveStatusEmitter(this.#adapter);
     this.#positionEmitter = new PassivePositionEmitter(this.#adapter);
-    this.#localdb = new PassiveLocalDatabase(this.#deviceManager, this.#statusEmitter);
+    this.#localdb = new PassiveLocalDatabase(
+      this.#deviceManager,
+      this.#statusEmitter,
+      config.databasePreference ?? 'auto'
+    );
   }
 
   /**

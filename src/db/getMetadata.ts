@@ -78,12 +78,12 @@ export async function viaLocal(
     throw new Error('Expected USB or SD slot for local database query');
   }
 
-  const orm = await local.get(deviceId, trackSlot);
-  if (orm === null) {
+  const adapter = await local.get(deviceId, trackSlot);
+  if (adapter === null) {
     return null;
   }
 
-  const track = orm.findTrack(trackId);
+  const track = adapter.findTrack(trackId);
 
   if (track === null) {
     return null;
