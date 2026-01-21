@@ -1,4 +1,4 @@
-# Opus Quad Support for prolink-connect
+# Opus Quad Support for alphatheta-connect
 
 ## Overview
 

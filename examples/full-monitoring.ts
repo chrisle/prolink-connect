@@ -15,7 +15,7 @@
  *   npx ts-node examples/full-monitoring.ts [--iface eth0] [--vcdj 7]
  */
 
-import {bringOnline} from 'prolink-connect';
+import {bringOnline} from 'alphatheta-connect';
 
 import {networkInterfaces} from 'os';
 

@@ -69,7 +69,7 @@ export interface OnAirStatus {
 Use the `onAirFromPacket()` function to parse on-air packets from the status socket:
 
 ```typescript
-import {onAirFromPacket} from 'prolink-connect/status/utils';
+import {onAirFromPacket} from 'alphatheta-connect/status/utils';
 
 // Inside your message handler
 const onAir = onAirFromPacket(buffer);
@@ -87,7 +87,7 @@ if (onAir) {
 The `StatusEmitter` now emits `onAir` events:
 
 ```typescript
-import {bringOnline} from 'prolink-connect';
+import {bringOnline} from 'alphatheta-connect';
 
 const network = await bringOnline();
 

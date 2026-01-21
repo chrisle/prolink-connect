@@ -1,16 +1,16 @@
 <p align="center">
-<img src=".github/logo.svg" alt="prolink-connect" />
+<img src=".github/logo.svg" alt="alphatheta-connect" />
 </p>
 
 <h3 align="center">
-	Pioneer's PRO DJ LINK protocol, unlocked.
+	AlphaTheta's PRO DJ LINK protocol, unlocked.
 	<br>
 	Consume CDJ states + Retrieve complete track metadata.
 </h3>
 
 <p align="center">
-	<img src="https://github.com/evanpurkhiser/prolink-connect/workflows/build/badge.svg" alt="build" />
-	<a href="https://www.npmjs.com/package/prolink-connect"><img alt="npm" src="https://img.shields.io/npm/v/prolink-connect"></a>
+	<img src="https://github.com/chrisle/alphatheta-connect/workflows/build/badge.svg" alt="build" />
+	<a href="https://www.npmjs.com/package/alphatheta-connect"><img alt="npm" src="https://img.shields.io/npm/v/alphatheta-connect"></a>
 </p>
 
 ---
@@ -81,7 +81,7 @@ To talk with Prolink devices on the network you'll first need to...
 3.  Connect to the devices on the network
 
 ```ts
-import {bringOnline} from 'prolink-connect';
+import {bringOnline} from 'alphatheta-connect';
 
 async function main() {
   // Bring the prolink network online.
@@ -90,7 +90,7 @@ async function main() {
   // regular announcement packets over UDP.
   //
   // This will FAIL if Rekordbox is running on the same computer, or a second
-  // instance of the prolink-connect library is running on the same machine.
+  // instance of the alphatheta-connect library is running on the same machine.
   console.info('Bringing the network online');
   const network = await bringOnline();
 
@@ -107,7 +107,7 @@ async function main() {
   //
   // There are two ways to configure the network:
   //
-  // 1. Automatically - You can ask prolink-connect to wait for a device to
+  // 1. Automatically - You can ask alphatheta-connect to wait for a device to
   //    appear on the network to determine what network interface devices exist
   //    on. Device ID 5 will be used in auto configure mode.
   //
@@ -120,7 +120,7 @@ async function main() {
   //  Using a ID between 1 - 6 will take up ONE SLOT on the network that normally
   //  a CDJ would occupy. When a 1-6 ID is used You may ONLY HAVE 5 CDJs on the
   //  network. Attempting to connect a 6th CDJ will conflict with the virtual
-  //  device announced on the network by prolink-connect. (On models older than
+  //  device announced on the network by alphatheta-connect. (On models older than
   //  2000s the rande is 1-4.)
   //
   //  There are some cases where you may want your virtual device to announce
@@ -159,7 +159,7 @@ async function main() {
 
 ## Thanks To
 
-- [@evanpurkhiser](https://github.com/evanpurkhiser) - Original author of prolink-connect and [Prolink Tools](https://prolink.tools/)
+- [@evanpurkhiser](https://github.com/evanpurkhiser) - Original author of alphatheta-connect (formerly prolink-connect) and [Prolink Tools](https://prolink.tools/)
 - [@brunchboy](https://github.com/brunchboy) - For his incredible work on [dysentery](https://github.com/brunchboy/dysentery) reverse engineering the Pro DJ Link protocol and [beat-link](https://github.com/Deep-Symmetry/beat-link) Java implementation
 - [Deep Symmetry](https://github.com/Deep-Symmetry) - For [crate-digger](https://github.com/Deep-Symmetry/crate-digger) and maintaining comprehensive Pro DJ Link protocol documentation
 - [@henrybetts](https://github.com/henrybetts) and [@flesniak](https://github.com/flesniak) - For reverse-engineering the rekordbox database format

@@ -1,6 +1,6 @@
 # Extended ANLZ Features
 
-This document describes the extended rekordbox analysis (ANLZ) file features that are now fully implemented in prolink-connect.
+This document describes the extended rekordbox analysis (ANLZ) file features that are now fully implemented in alphatheta-connect.
 
 ## Overview
 
@@ -22,7 +22,7 @@ Extended cues include all the information from basic cues (PCOB) plus:
 
 **Usage:**
 ```typescript
-import {loadAnlz} from 'prolink-connect/localdb/rekordbox';
+import {loadAnlz} from 'alphatheta-connect/localdb/rekordbox';
 
 const extAnlz = await loadAnlz(track, 'EXT', anlzLoader);
 

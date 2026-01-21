@@ -189,7 +189,7 @@ export class PassiveRemoteDatabase {
     // Create a virtual host device for the query interface
     const virtualHostDevice: Device = {
       id: this.#virtualDeviceId,
-      name: 'prolink-connect',
+      name: 'alphatheta-connect',
       type: 0x01, // CDJ type
       macAddr: new Uint8Array([0, 0, 0, 0, 0, 0]),
       ip: device.ip, // Not really used, just needs to be valid

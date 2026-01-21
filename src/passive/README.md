@@ -31,7 +31,7 @@ Before starting passive mode, you need to identify which network interface has P
 Auto-detect a single interface with AlphaTheta/Pioneer DJ devices. Returns the first match found.
 
 ```typescript
-import { findAlphaThetaInterface, bringOnlinePassive } from 'prolink-connect';
+import { findAlphaThetaInterface, bringOnlinePassive } from 'alphatheta-connect';
 
 const iface = findAlphaThetaInterface();
 if (iface) {
@@ -47,7 +47,7 @@ if (iface) {
 List **all** interfaces with detected AlphaTheta/Pioneer DJ devices. Useful when multiple devices are connected via different methods (USB and Ethernet) or when you want to present users with a choice.
 
 ```typescript
-import { findAllAlphaThetaInterfaces, bringOnlinePassive } from 'prolink-connect';
+import { findAllAlphaThetaInterfaces, bringOnlinePassive } from 'alphatheta-connect';
 
 const interfaces = findAllAlphaThetaInterfaces();
 
@@ -76,7 +76,7 @@ if (interfaces.length > 0) {
 List **all** network interfaces on the system (not just ones with detected Pro DJ Link devices). Useful as a fallback when auto-detection doesn't find devices (e.g., device not yet in ARP cache).
 
 ```typescript
-import { listInterfaces } from 'prolink-connect';
+import { listInterfaces } from 'alphatheta-connect';
 
 const allInterfaces = listInterfaces();
 
@@ -141,7 +141,7 @@ import {
   findAlphaThetaInterface,
   findAllAlphaThetaInterfaces,
   bringOnlinePassive,
-} from 'prolink-connect';
+} from 'alphatheta-connect';
 
 // Option 1: Auto-detect (uses first found)
 const iface = findAlphaThetaInterface();

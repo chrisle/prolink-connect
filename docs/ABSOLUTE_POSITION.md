@@ -1,6 +1,6 @@
 # Absolute Position Packet Support
 
-This document describes the absolute position packet support added to prolink-connect, enabling precise playhead tracking from CDJ-3000+ devices.
+This document describes the absolute position packet support added to alphatheta-connect, enabling precise playhead tracking from CDJ-3000+ devices.
 
 ## Overview
 
@@ -36,7 +36,7 @@ Offset  Field          Description
 ### Basic Example
 
 ```typescript
-import {bringOnline} from 'prolink-connect';
+import {bringOnline} from 'alphatheta-connect';
 
 const network = await bringOnline();
 await network.autoconfigFromPeers();

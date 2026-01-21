@@ -63,7 +63,7 @@ export interface AlphaThetaInterface {
  *
  * @example
  * ```typescript
- * import { findAlphaThetaInterface, bringOnlinePassive } from 'prolink-connect';
+ * import { findAlphaThetaInterface, bringOnlinePassive } from 'alphatheta-connect';
  *
  * const iface = findAlphaThetaInterface();
  * if (iface) {
@@ -93,7 +93,7 @@ export function findAlphaThetaInterface(): AlphaThetaInterface | null {
  *
  * @example
  * ```typescript
- * import { findAllAlphaThetaInterfaces, bringOnlinePassive } from 'prolink-connect';
+ * import { findAllAlphaThetaInterfaces, bringOnlinePassive } from 'alphatheta-connect';
  *
  * const interfaces = findAllAlphaThetaInterfaces();
  * if (interfaces.length > 0) {

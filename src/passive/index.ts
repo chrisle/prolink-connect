@@ -208,7 +208,7 @@ export class PassiveProlinkNetwork {
  *
  * @example
  * ```typescript
- * import { bringOnlinePassive } from 'prolink-connect';
+ * import { bringOnlinePassive } from 'alphatheta-connect';
  *
  * // Start passive monitoring on en15 (XDJ-XZ USB interface)
  * const network = await bringOnlinePassive({ iface: 'en15' });
@@ -245,7 +245,7 @@ export function bringOnlinePassive(config: PassiveNetworkConfig): PassiveProlink
  *
  * @example
  * ```typescript
- * import { listInterfaces } from 'prolink-connect/passive';
+ * import { listInterfaces } from 'alphatheta-connect/passive';
  *
  * const interfaces = listInterfaces();
  * console.log(interfaces);

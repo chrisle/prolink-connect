@@ -1,5 +1,5 @@
 {
-  "name": "prolink-connect",
+  "name": "alphatheta-connect",
   "version": "0.15.0",
   "main": "lib/index.js",
   "author": "Evan Purkhiser <evanpurkhiser@gmail.com>",
@@ -33,7 +33,7 @@
     "node": ">=22.0.0"
   },
   "bin": {
-    "prolink-connect": "./lib/cli.js"
+    "alphatheta-connect": "./lib/cli.js"
   },
   "sideEffects": false,
   "dependencies": {

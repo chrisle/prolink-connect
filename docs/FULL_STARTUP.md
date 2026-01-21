@@ -2,7 +2,7 @@
 
 ## Overview
 
-The prolink-connect library now supports an optional **full DJ Link startup protocol** implementation. By default, it uses a simple keep-alive approach (backward compatible), but you can enable the complete 4-stage device claiming protocol for advanced scenarios.
+The alphatheta-connect library now supports an optional **full DJ Link startup protocol** implementation. By default, it uses a simple keep-alive approach (backward compatible), but you can enable the complete 4-stage device claiming protocol for advanced scenarios.
 
 ## Why Full Startup?
 
@@ -23,7 +23,7 @@ The simple keep-alive approach (default) works fine for:
 Enable full startup mode by setting the `fullStartup` flag in your `NetworkConfig`:
 
 ```typescript
-import {bringOnline} from 'prolink-connect';
+import {bringOnline} from 'alphatheta-connect';
 
 // Bring the network online (creates sockets)
 const network = await bringOnline();
