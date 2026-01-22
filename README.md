@@ -1,3 +1,5 @@
+A Typescript / JavaScript library that is able to talk to AlphaTheta ProDJLink enabled DJ equipment
+
 <p align="center">
 <img src=".github/logo.svg" alt="alphatheta-connect" />
 </p>
@@ -15,7 +17,7 @@
 
 ---
 
-This library implements the Pioneer PROLINK network protocol + additional
+This library implements the AlphaTheta PROLINK network protocol + additional
 functionality to interact with the prolink network. This library is used as
 part of [Prolink Tools](https://prolink.tools/).
 
