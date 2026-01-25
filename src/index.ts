@@ -15,6 +15,14 @@ export {
 } from './artwork';
 export type {ExtractedArtwork, FileReader as ArtworkFileReader} from './artwork';
 
+// Full metadata extraction (title, artist, album, BPM, key, genre, artwork)
+export {
+  extractFullMetadata,
+  extractMetadataFromDevice,
+  isMetadataExtractionSupported,
+} from './metadata';
+export type {ExtractedMetadata} from './metadata';
+
 // Database adapters
 export type {
   DatabaseAdapter,

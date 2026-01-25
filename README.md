@@ -166,3 +166,12 @@ async function main() {
 - [Deep Symmetry](https://github.com/Deep-Symmetry) - For [crate-digger](https://github.com/Deep-Symmetry/crate-digger) and maintaining comprehensive Pro DJ Link protocol documentation
 - [@henrybetts](https://github.com/henrybetts) and [@flesniak](https://github.com/flesniak) - For reverse-engineering the rekordbox database format
 - [@GreyCat](https://github.com/GreyCat) - For Kaitai Struct expertise and guidance
+
+## Related Projects
+
+- [stagelinq](https://github.com/chrisle/stagelinq) — Denon StageLinq protocol integration
+- [metadata-connect](https://github.com/chrisle/metadata-connect) — Audio metadata extraction with partial file reads
+- [rekordbox-connect](https://github.com/chrisle/rekordbox-connect) — Rekordbox database integration
+- [serato-connect](https://github.com/chrisle/serato-connect) — Serato DJ integration
+
+These libraries power [Now Playing](https://nowplayingapp.com) — a real-time track display app for DJs and streamers.
